@@ -1,0 +1,242 @@
+{
+  "T01": {
+    "topic": "Technology",
+    "text": "Artificial Intelligence will improve society more than it will create problems."
+  },
+  "T02": {
+    "topic": "Technology",
+    "text": "Generative AI tools should be allowed as learning aids in higher education."
+  },
+  "T03": {
+    "topic": "Technology",
+    "text": "Students should disclose the use of AI in assignments and reports."
+  },
+  "T04": {
+    "topic": "Technology",
+    "text": "Every engineering student should receive formal education in AI."
+  },
+  "T05": {
+    "topic": "Technology",
+    "text": "Artificial Intelligence will significantly accelerate scientific discovery."
+  },
+  "T06": {
+    "topic": "Technology",
+    "text": "Most repetitive jobs will eventually be replaced by intelligent automation."
+  },
+  "T07": {
+    "topic": "Technology",
+    "text": "Robots should replace humans in hazardous occupations whenever possible."
+  },
+  "T08": {
+    "topic": "Technology",
+    "text": "AI-assisted diagnosis should become routine in healthcare."
+  },
+  "T09": {
+    "topic": "Technology",
+    "text": "Autonomous vehicles will ultimately make transportation safer."
+  },
+  "T10": {
+    "topic": "Technology",
+    "text": "Protection of personal data is more important than technological convenience."
+  },
+  "T11": {
+    "topic": "Technology",
+    "text": "Technology companies should explain how recommendation algorithms work."
+  },
+  "T12": {
+    "topic": "Technology",
+    "text": "Governments should introduce stricter regulations for Artificial Intelligence."
+  },
+  "T13": {
+    "topic": "Technology",
+    "text": "Cybersecurity deserves greater investment than the development of new digital technologies."
+  },
+  "T14": {
+    "topic": "Technology",
+    "text": "Social media algorithms contribute to opinion polarization."
+  },
+  "T15": {
+    "topic": "Technology",
+    "text": "Society will increasingly depend on AI-assisted decision making."
+  },
+  "E01": {
+    "topic": "Education",
+    "text": "Project-based learning develops deeper understanding than examination-oriented learning."
+  },
+  "E02": {
+    "topic": "Education",
+    "text": "Traditional written examinations accurately measure a student's knowledge."
+  },
+  "E03": {
+    "topic": "Education",
+    "text": "Class attendance should be compulsory for all courses."
+  },
+  "E04": {
+    "topic": "Education",
+    "text": "High-quality online learning can effectively complement classroom teaching."
+  },
+  "E05": {
+    "topic": "Education",
+    "text": "Students should be encouraged to take courses outside their primary discipline."
+  },
+  "E06": {
+    "topic": "Education",
+    "text": "Every undergraduate student should participate in at least one research project."
+  },
+  "E07": {
+    "topic": "Education",
+    "text": "Publishing research before graduation should be encouraged, but not mandatory."
+  },
+  "E08": {
+    "topic": "Education",
+    "text": "Maintaining academic honesty is more important than obtaining high grades."
+  },
+  "E09": {
+    "topic": "Education",
+    "text": "Collaborative learning is generally more effective than individual learning."
+  },
+  "E10": {
+    "topic": "Education",
+    "text": "Universities should prioritize innovation and problem-solving over rote learning."
+  },
+  "E11": {
+    "topic": "Education",
+    "text": "University curricula should be updated more frequently to match emerging technologies."
+  },
+  "E12": {
+    "topic": "Education",
+    "text": "Artificial intelligence should be integrated into teaching and personalized learning."
+  },
+  "E13": {
+    "topic": "Education",
+    "text": "Universities should invest more resources in research than in expanding infrastructure."
+  },
+  "E14": {
+    "topic": "Education",
+    "text": "Strong collaborations between universities and industry improve student education."
+  },
+  "E15": {
+    "topic": "Education",
+    "text": "Continuous learning and skill development are essential throughout one's career."
+  },
+  "S01": {
+    "topic": "Ethics",
+    "text": "Every individual has a responsibility to contribute positively to society."
+  },
+  "S02": {
+    "topic": "Ethics",
+    "text": "Universities should encourage students to participate in community service activities."
+  },
+  "S03": {
+    "topic": "Ethics",
+    "text": "New technologies should be evaluated for their societal impact before widespread deployment."
+  },
+  "S04": {
+    "topic": "Ethics",
+    "text": "Technology companies should be accountable for unethical use of their platforms."
+  },
+  "S05": {
+    "topic": "Ethics",
+    "text": "Individuals should have greater control over how their personal data are collected and used."
+  },
+  "S06": {
+    "topic": "Ethics",
+    "text": "Combating online misinformation requires shared responsibility among users, platforms, and governments."
+  },
+  "S07": {
+    "topic": "Ethics",
+    "text": "Equal opportunities should be prioritized regardless of a person's background."
+  },
+  "S08": {
+    "topic": "Ethics",
+    "text": "Diverse teams generally make better decisions than homogeneous teams."
+  },
+  "S09": {
+    "topic": "Ethics",
+    "text": "Universities should promote an inclusive environment where different viewpoints can be discussed respectfully."
+  },
+  "S10": {
+    "topic": "Ethics",
+    "text": "Scientific evidence should play an important role in public policy decisions."
+  },
+  "S11": {
+    "topic": "Ethics",
+    "text": "People should be free to express differing opinions as long as they do not promote harm or discrimination."
+  },
+  "S12": {
+    "topic": "Ethics",
+    "text": "Young people should actively participate in addressing societal challenges."
+  },
+  "S13": {
+    "topic": "Ethics",
+    "text": "Critical evaluation of online information should be taught as a core educational skill."
+  },
+  "S14": {
+    "topic": "Ethics",
+    "text": "Leaders should prioritize ethical decision-making even when it reduces short-term gains."
+  },
+  "S15": {
+    "topic": "Ethics",
+    "text": "Building public trust is essential for responsible adoption of emerging technologies."
+  },
+  "V01": {
+    "topic": "Environment",
+    "text": "Climate change requires immediate global action."
+  },
+  "V02": {
+    "topic": "Environment",
+    "text": "Governments should prioritize investment in renewable energy over fossil fuels."
+  },
+  "V03": {
+    "topic": "Environment",
+    "text": "Individuals should actively reduce their personal energy consumption."
+  },
+  "V04": {
+    "topic": "Environment",
+    "text": "Public transportation and non-motorized transport should be promoted even if they require additional public investment."
+  },
+  "V05": {
+    "topic": "Environment",
+    "text": "Single-use plastics should be significantly restricted."
+  },
+  "V06": {
+    "topic": "Environment",
+    "text": "Water conservation should be a priority in households, institutions, and industries."
+  },
+  "V07": {
+    "topic": "Environment",
+    "text": "Protecting biodiversity is essential for long-term human well-being."
+  },
+  "V08": {
+    "topic": "Environment",
+    "text": "Universities should adopt environmentally sustainable campus practices even if implementation costs increase."
+  },
+  "V09": {
+    "topic": "Environment",
+    "text": "Products should be designed to encourage reuse, repair, and recycling."
+  },
+  "V10": {
+    "topic": "Environment",
+    "text": "Consumers should consider environmental impact when purchasing products."
+  },
+  "V11": {
+    "topic": "Environment",
+    "text": "Technological innovation is essential for addressing environmental challenges."
+  },
+  "V12": {
+    "topic": "Environment",
+    "text": "Environmental sustainability should be integrated into higher education curricula."
+  },
+  "V13": {
+    "topic": "Environment",
+    "text": "Companies should be held accountable for the environmental impacts of their activities."
+  },
+  "V14": {
+    "topic": "Environment",
+    "text": "International cooperation is necessary to effectively address environmental challenges."
+  },
+  "V15": {
+    "topic": "Environment",
+    "text": "Current generations have a responsibility to protect natural resources for future generations."
+  }
+}
