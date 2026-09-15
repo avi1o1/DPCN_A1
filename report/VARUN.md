@@ -10,8 +10,12 @@ No script here builds a graph. Each script reads `data/graphs/`,
 `src/build_network.py` and `src/analysis.py` produced first.
 
 To calculate every number again, run `python src/run_all.py`. It takes
-approximately 80 seconds. To check the mathematics, run `python src/verify.py`.
-It does 21 independent checks and gives exit code 0 when they all pass.
+approximately 80 seconds.
+
+To check the mathematics, run `python src/verify.py`. It does 21 independent
+checks and gives exit code 0 when they all pass. To check that the numbers in
+this document still agree with the code, run `python src/check_docs.py`. It
+compares 119 values and statements against the output files.
 
 All the numbers below come from `data/dynamics_metrics.json`.
 
@@ -63,6 +67,29 @@ The script also does a permutation test on Aviral's Louvain communities. It
 shuffles the community labels 10000 times and keeps the community sizes the
 same. It does this twice, with 2 different sets of features.
 
+### A note on the missing answers
+
+There are 62 missing answers out of 5220, which is 1.19%. They affect 19 of the
+87 respondents. There are 2 correct ways to deal with them, and this part uses a
+different one from `AVIRAL.md`.
+
+`AVIRAL.md` removes a missing answer from the average. This gives the mean of
+what a respondent actually answered. The population means in that document use
+this method. For example, Environment is +1.37.
+
+This part replaces a missing answer with 0 before it takes the average. This is
+the same operation that `src/build_network.py` does before it calculates the
+similarity. So the opinions and the edges come from the same numbers. Under this
+method Environment is +1.35.
+
+The difference is small. For the mean opinion of the full class it is 1.1389
+against 1.1284, which is 0.0105. For 1 respondent it is as large as 0.23.
+
+Both methods are correct for their own purpose. Use the `AVIRAL.md` numbers to
+describe what the class answered. Use the numbers here for anything that must
+agree with the structure of the graph. Do not compare a value from one method
+with a value from the other.
+
 ### 5. Threshold sensitivity (`src/sensitivity.py`)
 
 `src/build_network.py` keeps the top 10% most similar pairs as edges. This
@@ -93,7 +120,7 @@ of the class from the process. See `dynamics_degroot_trajectories.png`.
 
 | Network | λ₂ = 1 - μ₂ | SLEM | Steps to converge | Giant | Consensus |
 | --- | --- | --- | --- | --- | --- |
-| overall | 0.628 | 0.397 | 23 | 51 | 1.409 |
+| overall | 0.627 | 0.397 | 23 | 51 | 1.409 |
 | ethics | 0.455 | 0.545 | 31 | 45 | 1.350 |
 | technology | 0.318 | 0.682 | 53 | 65 | 1.313 |
 | education | 0.264 | 0.736 | 61 | 63 | 1.275 |
