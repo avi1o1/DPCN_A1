@@ -7,9 +7,11 @@ Ethics, and Environment opinions (DPCN course, Assignment 1).
 
 - [x] Data cleaning, network construction, structural analysis, centralities, communities,
       static visualizations — done (Aviral). See `report/AVIRAL.md` (method + analysis/insights).
-- [ ] Dynamics / heavy math (opinion dynamics simulation, epidemic-threshold analysis,
-      ER null-model comparison) — see `report/VARUN_tasks.md`.
+- [x] Dynamics / heavy math (opinion dynamics simulation, epidemic-threshold analysis,
+      ER + configuration null models, community permutation test, threshold sensitivity)
+      — done (Varun). See `report/VARUN.md` (method + findings + report paragraphs).
 - [ ] Interactive dashboard — see `report/ARIHANT_tasks.md`.
+      Flat tables ready: run `python src/export_dashboard.py`, see `report/VARUN.md`.
 - [ ] Final report PDF assembling everyone's sections.
 
 ## Setup
@@ -33,6 +35,14 @@ Networks built: `overall` + one per topic (`technology`, `education`, `ethics`, 
 Nodes = respondents; an edge means two respondents are in the top 10% most similar pairs by
 cosine similarity of their (-2..+2) Likert scores.
 
+Then the dynamics on top of those graphs (reads `data/`, never rebuilds it):
+
+```bash
+python src/run_all.py           # -> data/dynamics_metrics.json, figures/dynamics_*.png  (~80s)
+python src/verify.py            # 21 independent checks of the maths, exit 0 when all pass
+python src/export_dashboard.py  # -> data/dashboard_{nodes.csv,networks.csv,curves.json}
+```
+
 ## Project layout
 
 ```
@@ -42,12 +52,22 @@ data/
   question_meta.json     question code -> {topic, text}
   graphs/                GraphML networks + raw similarity matrices
   metrics.json           structural metrics, centralities, communities per network
+  dynamics_metrics.json  DeGroot, epidemic, null models, threshold sensitivity
+  dashboard_*.csv/json   flat tables for the dashboard
 src/
-  data_prep.py
-  build_network.py
-  analysis.py
-  visualize.py
-figures/                 static PNG plots
-dashboard/                interactive dashboard (Arihant)
+  data_prep.py           \
+  build_network.py        |  Aviral: cleaning, construction,
+  analysis.py             |  structure, static figures
+  visualize.py           /
+  common.py              \
+  degroot.py              |
+  epidemic.py             |  Varun: dynamics, epidemic threshold,
+  nullmodels.py           |  null models, sensitivity
+  sensitivity.py          |
+  run_all.py              |  run_all.py runs the four analyses
+  verify.py               |  verify.py checks the maths
+  export_dashboard.py    /   export_dashboard.py feeds the dashboard
+figures/                 static PNG plots (dynamics_*.png are Varun's)
+dashboard/               interactive dashboard (Arihant, not created yet)
 report/                  handoff docs + eventual report PDF
 ```
