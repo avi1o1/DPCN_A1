@@ -10,8 +10,8 @@ Ethics, and Environment opinions (DPCN course, Assignment 1).
 - [x] Dynamics / heavy math (opinion dynamics simulation, epidemic-threshold analysis,
       ER + configuration null models, community permutation test, threshold sensitivity)
       — done (Varun). See `report/VARUN.md` (method + findings + report paragraphs).
-- [ ] Interactive dashboard — see `report/ARIHANT_tasks.md`.
-      Flat tables ready: run `python src/export_dashboard.py`, see `report/VARUN.md`.
+- [x] Interactive dashboard — done (Arihant). See `report/ARIHANT.md`.
+      Open `dashboard/index.html` in a browser; no server, no install, no build step.
 - [ ] Final report PDF assembling everyone's sections.
 
 ## Setup
@@ -44,6 +44,16 @@ python src/check_docs.py        # confirms report/VARUN.md matches the numbers a
 python src/export_dashboard.py  # -> data/dashboard_{nodes.csv,networks.csv,curves.json}
 ```
 
+Then the dashboard on top of all of it (standard library only, no virtualenv needed):
+
+```bash
+python src/build_dashboard.py   # -> dashboard/index.html
+```
+
+Open `dashboard/index.html` by double-clicking it. The page embeds its own data, so it needs
+no server and no network access. Sources are in `src/dashboard_template/`; never edit
+`dashboard/index.html` by hand, it is generated.
+
 ## Project layout
 
 ```
@@ -69,7 +79,9 @@ src/
   verify.py              |  verify.py checks the maths
   check_docs.py          |  check_docs.py checks the writeup
   export_dashboard.py    /   export_dashboard.py feeds the dashboard
+  build_dashboard.py     \  Arihant: builds the dashboard from data/
+  dashboard_template/    /  its HTML/CSS/JS sources, inlined at build time
 figures/                 static PNG plots (dynamics_*.png are Varun's)
-dashboard/               interactive dashboard (Arihant, not created yet)
+dashboard/               index.html, the interactive dashboard (self-contained)
 report/                  handoff docs + eventual report PDF
 ```
