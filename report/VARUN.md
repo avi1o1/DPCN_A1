@@ -10,14 +10,8 @@ No script here builds a graph. Each script reads `data/graphs/`,
 `src/build_network.py` and `src/analysis.py` produced first.
 
 To calculate every number again, run `python src/run_all.py`. It takes
-approximately 80 seconds.
-
-To check the mathematics, run `python src/verify.py`. It does 21 independent
-checks and gives exit code 0 when they all pass. To check that the numbers in
-this document still agree with the code, run `python src/check_docs.py`. It
-compares 119 values and statements against the output files.
-
-All the numbers below come from `data/dynamics_metrics.json`.
+approximately 80 seconds. All the numbers below come from
+`data/dynamics_metrics.json`.
 
 ## Method
 

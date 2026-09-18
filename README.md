@@ -39,8 +39,6 @@ Then the dynamics on top of those graphs (reads `data/`, never rebuilds it):
 
 ```bash
 python src/run_all.py           # -> data/dynamics_metrics.json, figures/dynamics_*.png  (~80s)
-python src/verify.py            # 21 independent checks of the maths, exit 0 when all pass
-python src/check_docs.py        # confirms report/VARUN.md matches the numbers above
 python src/export_dashboard.py  # -> data/dashboard_{nodes.csv,networks.csv,curves.json}
 ```
 
@@ -76,8 +74,6 @@ src/
   nullmodels.py           |  null models, sensitivity
   sensitivity.py          |
   run_all.py             |  run_all.py runs the four analyses
-  verify.py              |  verify.py checks the maths
-  check_docs.py          |  check_docs.py checks the writeup
   export_dashboard.py    /   export_dashboard.py feeds the dashboard
   build_dashboard.py     \  Arihant: builds the dashboard from data/
   dashboard_template/    /  its HTML/CSS/JS sources, inlined at build time
