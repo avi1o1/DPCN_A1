@@ -6,7 +6,7 @@
 \usepackage{lmodern}
 \usepackage[english]{babel}
 \usepackage{microtype}
-\usepackage[a4paper,top=1.7cm,bottom=1.7cm,left=2.0cm,right=2.0cm]{geometry}
+\usepackage[a4paper,top=1.5cm,bottom=1.5cm,left=2.0cm,right=2.0cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -32,10 +32,10 @@
 % ---------- headings ----------
 \titleformat{\section}{\sffamily\large\bfseries\color{accent}}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\sffamily\normalsize\bfseries\color{ink}}{\thesubsection}{0.5em}{}
-\titlespacing*{\section}{0pt}{1.1em}{0.4em}
-\titlespacing*{\subsection}{0pt}{0.8em}{0.3em}
+\titlespacing*{\section}{0pt}{0.9em}{0.3em}
+\titlespacing*{\subsection}{0pt}{0.65em}{0.25em}
 
-\captionsetup{font=small,labelfont={bf,color=accent},labelsep=period,skip=4pt}
+\captionsetup{font=small,labelfont={bf,color=accent},labelsep=period,skip=3pt}
 
 % ---------- header / footer ----------
 \pagestyle{fancy}
@@ -55,9 +55,9 @@
 \setlist[dash]{label=\textendash, leftmargin=1.3em, itemsep=1.5pt, topsep=2pt,
   parsep=0pt}
 
-\setlength{\parskip}{0.3em}
+\setlength{\parskip}{0.2em}
 \setlength{\parindent}{0pt}
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.06}
 \raggedbottom
 
 \begin{document}
@@ -68,14 +68,14 @@
   Technology, Education, Ethics, and Environment}
 
 \author{%
-  Aviral Gupta \\ \normalsize 2023111023
+  Aviral Gupta \\[-0.15em] \small 2023111023
   \and
-  Varun Shastry \\ \normalsize 2023112005
+  Varun Shastry \\[-0.15em] \small 2023112005
   \and
-  Arihant Tripathy \\ \normalsize 2023111026}
+  Arihant Tripathy \\[-0.15em] \small 2023111026}
 
-\date{DPCN, Assignment 1 \\[0.35em]
-  Team \team \\[0.35em]
+\date{DPCN, Assignment 1 \\[0.2em]
+  Team \team \\[0.2em]
   \url{https://github.com/avi1o1/DPCN_A1}}
 
 \maketitle
@@ -102,7 +102,7 @@ when their survey answers are similar. We then study the network in three ways.
 \lab{Headline} 51 of the 87 respondents, which is 59\%, fall into one
 connected group. The other 36 do not have any strong-similarity partner.
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{../figures/report/overview.pdf}
   \caption{\textbf{(a)} How the 87 respondents divide into the giant component,
@@ -192,7 +192,7 @@ compared with a random graph that keeps the same degrees.
 
 \lab{Results}
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
@@ -229,7 +229,7 @@ opinion pattern.}
   Figure~\ref{fig:structure} shows.
 \end{dash}
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{../figures/report/structure.pdf}
   \caption{\textbf{(a)} Degree distribution of the overall network on log-log
@@ -267,9 +267,9 @@ nodes. \emph{Louvain} looks for the grouping with the highest modularity.
   These are different levels of agreement and not opposing camps.
 \end{dash}
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{../figures/report/networks.pdf}
+  \includegraphics[width=0.84\linewidth]{../figures/report/networks.pdf}
   \caption{Force-directed node-link views with node size scaled by degree. The
   giant component is laid out in the centre, the remaining small components sit
   on an inner ring, and the isolates sit on the outer ring.
@@ -285,7 +285,7 @@ nodes. \emph{Louvain} looks for the grouping with the highest modularity.
 
 \lab{Observation} The per-topic network results do not follow the raw averages.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -336,7 +336,7 @@ controls the speed. The algebraic connectivity is $\lambda_2=1-\mu_2$.
 
 \lab{Results}
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
@@ -378,7 +378,7 @@ threshold means the opinion spreads more easily. This calculation uses $A$
 itself and not the row-normalised $D^{-1}A$, because one infected person can
 infect neighbours separately instead of averaging with them.
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{../figures/report/dynamics.pdf}
   \caption{\textbf{(a)} DeGroot trajectories $x_i(t)$ on the overall network.
@@ -399,7 +399,7 @@ and record the structure each time.
 
 \lab{Results}
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -458,7 +458,7 @@ agreement and social cohesion are not the same thing.
 
 \lab{Finding 3. More fragmented topics have lower SIS thresholds}
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -495,7 +495,7 @@ whether a random network with no opinion structure would give the same result.
 The z-score is $z=(\text{real}-\text{null mean})/\text{null s.d.}$. When
 $|z|<2$, the real value looks close to random.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
@@ -527,7 +527,7 @@ z-score inside the random band.}
   for the structural analysis rather than weakening it.
 \end{dash}
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=0.86\linewidth]{../figures/report/nullmodels.pdf}
   \caption{Null-model z-scores on a symmetric-log axis. The shaded band shows
@@ -542,7 +542,7 @@ permutation test shuffles the community labels 10{,}000 times while keeping the
 group sizes fixed. It then measures the opinion variance inside the groups. The
 p-value is the fraction of shuffles that do better than the real grouping.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -571,7 +571,7 @@ graph and fail when we test only the coarser topic averages.}
   does not \emph{define} it, and is not presented as a definition.
 \end{dash}
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=0.78\linewidth]{../figures/report/heatmap.pdf}
   \caption{Mean score of each large community for each topic, against the class
@@ -598,7 +598,7 @@ graph and fail when we test only the coarser topic averages.}
 % ============================================================
 \section{Individual Contribution}
 
-\begin{table}[!htbp]
+\begin{table}[!ht]
 \centering\small
 \begin{tabular}{@{}p{0.13\linewidth}p{0.81\linewidth}@{}}
 \toprule

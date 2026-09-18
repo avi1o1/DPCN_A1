@@ -128,7 +128,7 @@ def load_graph(name: str) -> nx.Graph:
 def fig_overview() -> None:
     """Where the 87 respondents sit, and who the disconnected ones are."""
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(TEXT_WIDTH_IN, 2.6),
+        1, 2, figsize=(TEXT_WIDTH_IN, 2.1),
         gridspec_kw={"width_ratios": [1.15, 1.0], "wspace": 0.34},
     )
 
@@ -189,7 +189,7 @@ def fig_overview() -> None:
 def fig_structure() -> None:
     """Degree distribution and the top of the degree-centrality ranking."""
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(TEXT_WIDTH_IN, 2.5),
+        1, 2, figsize=(TEXT_WIDTH_IN, 2.0),
         gridspec_kw={"width_ratios": [1.0, 1.0], "wspace": 0.28},
     )
 
@@ -291,7 +291,7 @@ def _draw(ax, g: nx.Graph, pos: dict, colors, sizes) -> None:
 
 
 def fig_networks() -> None:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(TEXT_WIDTH_IN, 3.35))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(TEXT_WIDTH_IN, 2.95))
 
     # (a) overall, coloured by Louvain community.
     g = load_graph("overall")
@@ -367,7 +367,7 @@ def _degroot_trajectory(name: str, steps: int = 30) -> tuple[np.ndarray, np.ndar
 
 def fig_dynamics() -> None:
     fig, axes = plt.subplots(
-        1, 3, figsize=(TEXT_WIDTH_IN, 2.35),
+        1, 3, figsize=(TEXT_WIDTH_IN, 2.0),
         gridspec_kw={"wspace": 0.46},
     )
     ax1, ax2, ax3 = axes
@@ -450,7 +450,7 @@ def fig_nullmodels() -> None:
     er = [nm["vs_erdos_renyi"][k]["z_score"] for k, _ in stats]
     cm = [nm["vs_configuration_model"][k]["z_score"] for k, _ in stats]
 
-    fig, ax = plt.subplots(figsize=(TEXT_WIDTH_IN * 0.82, 2.25))
+    fig, ax = plt.subplots(figsize=(TEXT_WIDTH_IN * 0.82, 1.7))
     y = np.arange(len(stats))[::-1]
     off = 0.18
     ax.axvspan(-2, 2, color="#eceef1", zorder=0)
@@ -500,7 +500,7 @@ def fig_heatmap() -> None:
 
     # A dot plot rather than a heat map: the reader takes each value off the
     # shared x axis instead of from a number printed in a coloured cell.
-    fig, ax = plt.subplots(figsize=(TEXT_WIDTH_IN * 0.72, 1.85))
+    fig, ax = plt.subplots(figsize=(TEXT_WIDTH_IN * 0.72, 1.45))
     rows = np.arange(len(topics))[::-1]
     markers = ["o", "s", "^", "D", "v"]
     spread = np.linspace(0.26, -0.26, len(keep))
