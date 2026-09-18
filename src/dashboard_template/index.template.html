@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Opinion Network Explorer</title>
-<meta name="description" content="Interactive explorer for the class opinion-similarity networks: structure, centrality, communities and dynamics across five networks.">
+<meta name="description" content="Interactive explorer for the class opinion-similarity networks: structure, centrality and dynamics across five networks.">
 <style>/*__STYLES__*/</style>
 </head>
 <body>
@@ -39,7 +39,6 @@
       </div>
     </div>
 
-    <!-- the one filter row: it scopes every number, chart and table below -->
     <div class="filterbar" role="group" aria-label="Network filter">
       <span class="filterbar__label">Network</span>
       <div class="netpicker" id="netpicker"></div>
@@ -50,7 +49,6 @@
       <a href="#explorer">Network</a>
       <a href="#structure">Structure</a>
       <a href="#people">People</a>
-      <a href="#communities">Communities</a>
       <a href="#compare">Topics</a>
       <a href="#dynamics">Dynamics</a>
       <a href="#nullmodels">Null models</a>
@@ -75,7 +73,7 @@
   <section class="section" id="explorer">
     <div class="section__head">
       <h2>The network</h2>
-      <p>Each dot is a respondent; a line means the two are in the top&nbsp;10% most similar pairs of opinion vectors. Drag the background to pan, scroll to zoom, drag a dot to move it, click to inspect.</p>
+      <p>Each dot is one person. A line connects two people whose survey answers are in the top 10% most similar. Drag to pan, scroll to zoom, click a dot to see their details.</p>
     </div>
 
     <div class="explorer">
@@ -96,7 +94,7 @@
         </div>
 
         <div class="stage__canvas" id="stage-canvas">
-          <canvas id="graph" role="img" aria-label="Node-link diagram of the selected opinion network. The table under 'People' lists every respondent with the same values."></canvas>
+          <canvas id="graph" role="img" aria-label="Node-link diagram of the selected opinion network."></canvas>
           <div class="stage__legend" id="stage-legend">
             <h4 id="legend-title">Legend</h4>
             <div id="legend-body"></div>
@@ -126,7 +124,7 @@
   <section class="section" id="structure">
     <div class="section__head">
       <h2>Structure</h2>
-      <p>How connection is spread across the class, and who sits at the centre of it.</p>
+      <p>How connections are spread across the class and who has the most.</p>
     </div>
 
     <div class="grid grid--halves">
@@ -136,16 +134,8 @@
             <h3>Degree distribution</h3>
             <p id="degree-sub"></p>
           </div>
-          <div class="card__tools">
-            <div class="seg" id="degree-scale" role="group" aria-label="Degree axis scale">
-              <button type="button" data-scale="linear" aria-pressed="true">Linear</button>
-              <button type="button" data-scale="log" aria-pressed="false">Log-log</button>
-            </div>
-            <button class="btn btn--ghost" type="button" data-table-for="degree-table" aria-pressed="false">Table</button>
-          </div>
         </div>
         <svg class="chart" id="degree-chart" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet" role="img"></svg>
-        <div id="degree-table" hidden></div>
         <p class="note" id="degree-note"></p>
       </div>
 
@@ -157,11 +147,9 @@
           </div>
           <div class="card__tools">
             <div class="seg" id="centrality-pick" role="group" aria-label="Centrality measure"></div>
-            <button class="btn btn--ghost" type="button" data-table-for="central-table" aria-pressed="false">Table</button>
           </div>
         </div>
         <svg class="chart" id="central-chart" viewBox="0 0 640 340" preserveAspectRatio="xMidYMid meet" role="img"></svg>
-        <div id="central-table" hidden></div>
         <p class="note" id="central-note"></p>
       </div>
     </div>
@@ -171,65 +159,34 @@
   <section class="section" id="people">
     <div class="section__head">
       <h2>Respondent profile</h2>
-      <p>The selected respondent's actual answers, next to the class. Pick anyone from the network, the bars above, or the search box.</p>
+      <p>See how one person answered all 60 questions. Pick someone from the network, the chart above, or the search box.</p>
     </div>
     <div class="card">
       <div class="card__head">
         <div>
           <h3 id="profile-title">No respondent selected</h3>
-          <p id="profile-sub">Scores run −2 (strongly disagree) to +2 (strongly agree). Hatched cells are "No comments", which we counted as missing rather than neutral.</p>
-        </div>
-        <div class="card__tools">
-          <button class="btn btn--ghost" type="button" data-table-for="profile-table" aria-pressed="false">Table</button>
+          <p id="profile-sub">Scores go from −2 (strongly disagree) to +2 (strongly agree). Hatched cells mean "No comments", counted as missing.</p>
         </div>
       </div>
       <div class="heat-scroll"><div class="answers" id="profile-answers"></div></div>
       <div class="legend" id="profile-legend"></div>
-      <div id="profile-table" hidden></div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <section class="section" id="communities">
-    <div class="section__head">
-      <h2>Communities</h2>
-      <p>Louvain groups in the selected network, described by how far each group's mean score sits from the class mean on each topic.</p>
-    </div>
-    <div class="card">
-      <div class="card__head">
-        <div>
-          <h3 id="heat-title">Community × topic, deviation from the class mean</h3>
-          <p>Blue = below the class mean, red = above, grey = at it. Only groups of 3 or more are shown. Hover a cell for the exact numbers.</p>
-        </div>
-        <div class="card__tools">
-          <button class="btn btn--ghost" type="button" data-table-for="heat-table" aria-pressed="false">Table</button>
-        </div>
-      </div>
-      <div class="heat-scroll"><div class="heat" id="heat"></div></div>
-      <div class="legend" id="heat-legend"></div>
-      <div id="heat-table" hidden></div>
-      <p class="note" id="heat-note"></p>
     </div>
   </section>
 
   <!-- ============================================================ -->
   <section class="section" id="compare">
     <div class="section__head">
-      <h2>The five networks side by side</h2>
-      <p>Built from identical rules on the same 87 people, so every difference below comes from the opinions, not the construction. All five have exactly 375 edges.</p>
+      <h2>Comparing all five topics</h2>
+      <p>Same 87 people, same rules, same number of edges (375). The only thing that changes is which survey questions are used. So any difference you see comes from the opinions themselves.</p>
     </div>
     <div class="card">
       <div class="card__head">
         <div>
-          <h3>Structure by topic</h3>
-          <p>Each panel is one measure across all five networks. The selected network is labelled.</p>
-        </div>
-        <div class="card__tools">
-          <button class="btn btn--ghost" type="button" data-table-for="compare-table" aria-pressed="false">Table</button>
+          <h3>How each topic's network looks</h3>
+          <p>Each chart shows one measure across all five networks. Your selected network is highlighted.</p>
         </div>
       </div>
       <div class="grid" id="compare-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))"></div>
-      <div id="compare-table" hidden></div>
       <p class="note" id="compare-note"></p>
     </div>
   </section>
@@ -237,56 +194,46 @@
   <!-- ============================================================ -->
   <section class="section" id="dynamics">
     <div class="section__head">
-      <h2>Dynamics on the network</h2>
-      <p>What the structure does to things that travel over it: an averaging opinion process, and a contagion.</p>
+      <h2>What happens on the network</h2>
+      <p>Two simulations. One where people average their opinions with their neighbours. One where an infection spreads through connections.</p>
     </div>
 
     <div class="grid grid--halves">
       <div class="card">
         <div class="card__head">
           <div>
-            <h3>Where opinions settle (DeGroot)</h3>
+            <h3>Opinion averaging (DeGroot model)</h3>
             <p id="degroot-sub"></p>
-          </div>
-          <div class="card__tools">
-            <button class="btn btn--ghost" type="button" data-table-for="degroot-table" aria-pressed="false">Table</button>
           </div>
         </div>
         <svg class="chart" id="degroot-chart" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet" role="img"></svg>
-        <div id="degroot-table" hidden></div>
         <p class="note" id="degroot-note"></p>
       </div>
 
       <div class="card">
         <div class="card__head">
           <div>
-            <h3>Epidemic threshold</h3>
-            <p>Simulated SIS prevalence against the spectral prediction. The vertical rule is λ⁄λ<sub>c</sub> = 1, where the theory says an outbreak first becomes possible.</p>
-          </div>
-          <div class="card__tools">
-            <button class="btn btn--ghost" type="button" data-table-for="sis-table" aria-pressed="false">Table</button>
+            <h3>Disease spreading (SIS model)</h3>
+            <p>How much infection survives at different spreading rates. The dashed line marks &lambda;<sub>c</sub>, the predicted minimum rate for an outbreak to persist.</p>
           </div>
         </div>
         <svg class="chart" id="sis-chart" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet" role="img"></svg>
         <div class="legend" id="sis-legend"></div>
-        <div id="sis-table" hidden></div>
         <p class="note" id="sis-note"></p>
       </div>
 
       <div class="card grid--full">
         <div class="card__head">
           <div>
-            <h3>How much the 10% cut-off decides</h3>
-            <p>Re-thresholding the same similarity matrices at every quantile from 0.50 to 0.99. The marker sits on the 0.90 cut the whole study uses.</p>
+            <h3>Does the 10% cut-off matter?</h3>
+            <p>What happens if we change how strict the similarity cut-off is. The marker shows the 0.90 cut-off this study uses. Slide left for looser, right for stricter.</p>
           </div>
           <div class="card__tools">
             <div class="seg" id="sens-measure" role="group" aria-label="Sensitivity measure"></div>
-            <button class="btn btn--ghost" type="button" data-table-for="sens-table" aria-pressed="false">Table</button>
           </div>
         </div>
         <svg class="chart chart--wide" id="sens-chart" viewBox="0 0 980 320" preserveAspectRatio="xMidYMid meet" role="img"></svg>
         <div class="legend" id="sens-legend"></div>
-        <div id="sens-table" hidden></div>
         <p class="note" id="sens-note"></p>
       </div>
     </div>
@@ -295,22 +242,18 @@
   <!-- ============================================================ -->
   <section class="section" id="nullmodels">
     <div class="section__head">
-      <h2>Is any of this more than chance?</h2>
-      <p>The overall network against 500 random graphs of each kind. A z-score past ±2 means the real value is not something the null model produces.</p>
+      <h2>Is this just random?</h2>
+      <p>We compare the real network to 500 random graphs. If the z-score is bigger than 2 or smaller than -2, the real network is different from what you would get by chance.</p>
     </div>
     <div class="card">
       <div class="card__head">
         <div>
-          <h3>Real network vs. two null models</h3>
-          <p>Erdős–Rényi keeps only the density. The configuration model also keeps every respondent's exact degree.</p>
-        </div>
-        <div class="card__tools">
-          <button class="btn btn--ghost" type="button" data-table-for="null-table" aria-pressed="false">Table</button>
+          <h3>Real network vs. random networks</h3>
+          <p>Two kinds of random graphs. Erdos-Renyi keeps only the number of edges. The configuration model also keeps each person's exact number of connections.</p>
         </div>
       </div>
       <svg class="chart chart--wide" id="null-chart" viewBox="0 0 700 300" preserveAspectRatio="xMidYMid meet" role="img"></svg>
       <div class="legend" id="null-legend"></div>
-      <div id="null-table" hidden></div>
       <p class="note" id="null-note"></p>
     </div>
   </section>
@@ -318,8 +261,8 @@
   <!-- ============================================================ -->
   <section class="section" id="findings">
     <div class="section__head">
-      <h2>What the picture says</h2>
-      <p>The four readings the rest of the report is built on. Every number here is live from the panels above.</p>
+      <h2>Key takeaways</h2>
+      <p>Four main findings from the data. All numbers update when you switch networks.</p>
     </div>
     <div class="findings" id="findings-grid"></div>
   </section>

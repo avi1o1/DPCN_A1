@@ -68,7 +68,6 @@
     hovered: null,
     highlightCommunity: null,
     centrality: "degree_centrality",
-    degreeScale: "linear",
     sensMeasure: "y_giant_fraction"
   };
 
@@ -407,16 +406,6 @@
       renderSensitivity();
     });
 
-    Array.prototype.forEach.call($("degree-scale").children, function (button) {
-      button.addEventListener("click", function () {
-        state.degreeScale = button.getAttribute("data-scale");
-        Array.prototype.forEach.call($("degree-scale").children, function (other) {
-          other.setAttribute("aria-pressed", String(other === button));
-        });
-        renderDegree();
-      });
-    });
-
     $("toggle-isolates").addEventListener("change", function (event) {
       state.showIsolates = event.target.checked;
       graph.fit(true);
@@ -466,49 +455,48 @@
 
     // when every fragment is a single person, saying it twice reads as a bug
     var rest = paired === 0
-      ? "The other " + outside + " have no strong-similarity partner at all."
-      : "The other " + outside + " are split across " + fragments + " fragments: " + paired +
-        " in small pairs and clusters, and " + stats.n_isolated + " with no partner at all.";
+      ? "The other " + outside + " have no similar partner at all."
+      : "The other " + outside + " are in " + fragments + " smaller groups: " + paired +
+        " in small clusters, and " + stats.n_isolated + " completely alone.";
 
     $("hero-caption").textContent =
-      "of the class sits in one connected core, " + connected + " of " + stats.n_nodes +
-      " respondents. " + rest;
+      "of the class is in one big connected group. That is " + connected + " out of " + stats.n_nodes +
+      " people. " + rest;
   }
 
   function renderTiles() {
     var stats = DATA.networkStats[state.network];
-    var net = currentNetwork();
     var degroot = DATA.dynamics.degroot[state.network];
 
     var tiles = [
       {
-        label: "Edges kept, of 3,741 possible pairs",
+        label: "Edges",
+        tip: "How many connections exist in this network. Out of 3,741 possible pairs among 87 people.",
         value: String(stats.n_edges),
         meter: stats.density
       },
       {
         label: "Average degree",
+        tip: "On average, how many connections each person has. Someone with degree 0 has no similar partner.",
         value: fmt(stats.avg_degree, 1),
         meter: stats.avg_degree / 20
       },
       {
-        label: "Average clustering coefficient",
+        label: "Clustering",
+        tip: "How often someone's friends are also friends with each other. Higher means tighter groups. 1.0 would mean everyone's friends all know each other.",
         value: fmt(stats.avg_clustering, 2),
         meter: stats.avg_clustering
       },
       {
-        label: "Respondents with no edge",
+        label: "Isolates",
+        tip: "People with zero connections. Their answers are not similar enough to anyone else to make the top-10% cut.",
         value: String(stats.n_isolated),
         suffix: " of " + stats.n_nodes,
         meter: stats.n_isolated / stats.n_nodes
       },
       {
-        label: "Modularity Q of the Louvain split",
-        value: fmt(net.community.modularity, 3),
-        meter: net.community.modularity / 0.4
-      },
-      {
-        label: "Steps for the core to reach consensus",
+        label: "Consensus steps",
+        tip: "How many rounds of opinion-averaging it takes for the connected group to agree on one number. Fewer steps means the group is more tightly connected.",
         value: String(degroot.steps_to_converge_giant),
         meter: degroot.steps_to_converge_giant / 80
       }
@@ -516,8 +504,12 @@
 
     var host = clear($("tiles"));
     tiles.forEach(function (tile) {
+      var labelEl = el("div", { class: "tile__label" }, [
+        tile.label,
+        el("span", { class: "info-icon", "data-tip": tile.tip, text: "i" })
+      ]);
       host.appendChild(el("div", { class: "tile" }, [
-        el("div", { class: "tile__label", text: tile.label }),
+        labelEl,
         el("div", { class: "tile__value" }, [
           tile.value,
           tile.suffix ? el("small", { text: tile.suffix }) : null
@@ -916,9 +908,9 @@
       rows.unshift(["Degree", String(node.degree)]);
       rows.push(["Opinion, this topic", fmt(opinionOf(node), 2)]);
       var foot = node.isolate
-        ? "No edges, so this respondent never moves under the averaging dynamics."
-        : "Community " + node.community + " · " + (node.inGiant ? "in the connected core" : "in a side fragment") +
-          " · settles at " + fmt(node.degroot, 2);
+        ? "No connections. Never changes opinion in the averaging model."
+        : "Community " + node.community + " · " + (node.inGiant ? "in the main group" : "in a smaller group") +
+          " · opinion settles at " + fmt(node.degroot, 2);
       return { title: "Respondent " + node.id, rows: rows, foot: foot, colour: colourOf(node) };
     }
 
@@ -1050,12 +1042,12 @@
       host.appendChild(el("div", {
         class: "legend-scale",
         style: { marginTop: "6px" },
-        text: "Grey midpoint = the class mean, " + fmt(scale.mid, 2)
+        text: "Grey middle = class average, " + fmt(scale.mid, 2)
       }));
       return;
     }
 
-    $("legend-title").textContent = "Louvain communities";
+    $("legend-title").textContent = "Community groups";
     var slots = graph.communitySlots();
     var groups = currentNetwork().communities;
     var rows = el("div", { class: "legend-rows" });
@@ -1101,14 +1093,13 @@
       host.appendChild(el("div", {
         class: "legend-scale",
         style: { marginTop: "7px", display: "block", lineHeight: "1.45" },
-        text: "Only the four largest get their own hue. Past four, colours stop being reliably " +
-          "distinguishable, so the rest are outlined instead. Click any row to isolate that group."
+        text: "Only the four largest groups get their own colour. The rest use outlines so you can still tell them apart. Click any row to highlight that group."
       }));
     } else {
       host.appendChild(el("div", {
         class: "legend-scale",
         style: { marginTop: "7px", display: "block" },
-        text: "Click a row to isolate that group."
+        text: "Click a row to highlight that group."
       }));
     }
   }
@@ -1141,9 +1132,8 @@
     if (!state.selected) {
       host.appendChild(el("p", {
         class: "inspector__empty",
-        text: "Click a dot in the network, search for an id, or pick a bar under Most central " +
-          "respondents. You get that person's four centrality values with their rank, their community, " +
-          "and how their answers compare with the class."
+        text: "Click a dot in the network, search by id, or pick a bar from the centrality chart. " +
+          "You will see that person's centrality scores, their community, and how their answers compare to the class."
       }));
       return;
     }
@@ -1169,7 +1159,7 @@
         el("span", { class: "key", style: { background: graph.communitySlots()[node.community].fill } }),
         "Community " + node.community
       ]),
-      el("span", { class: "chip", text: node.inGiant ? "In the core" : (node.isolate ? "Isolated" : "Side fragment") }),
+      el("span", { class: "chip", text: node.inGiant ? "In the main group" : (node.isolate ? "No connections" : "Smaller group") }),
       person.n_missing ? el("span", { class: "chip", text: person.n_missing + " unanswered" }) : null
     ]));
 
@@ -1181,7 +1171,7 @@
         el("span", { class: "rank", text: "#" + ranks[key][node.id] })
       ]));
     });
-    kv.appendChild(el("dt", { text: "Settles at (DeGroot)" }));
+    kv.appendChild(el("dt", { text: "Final opinion (DeGroot)" }));
     kv.appendChild(el("dd", { text: fmt(node.degroot, 2) }));
     host.appendChild(kv);
 
@@ -1192,8 +1182,8 @@
       class: "note",
       style: { marginTop: "12px" },
       text: node.isolate
-        ? "With no neighbours this respondent never updates: their limit equals their starting score."
-        : "The tick on each bar marks the class mean for that topic."
+        ? "With no connections, this person's opinion never changes. They stay at their starting score."
+        : "The tick mark on each bar shows the class average for that topic."
     }));
   }
 
@@ -1243,9 +1233,7 @@
 
     if (!state.selected) {
       $("profile-title").textContent = "No respondent selected";
-      host.appendChild(el("p", { class: "inspector__empty", text: "Pick anyone in the network above to see their sixty answers." }));
-      $("profile-table").hidden = true;
-      clear($("profile-table"));
+      host.appendChild(el("p", { class: "inspector__empty", text: "Click on anyone in the network above to see all their answers." }));
       return;
     }
 
@@ -1312,7 +1300,6 @@
       "No comments (missing)"
     ]));
 
-    setTable("profile-table", ["Question", "Topic", "Answer", "Statement"], rows);
   }
 
   /* ---------------------------------------------------------------
@@ -1396,119 +1383,102 @@
     var net = currentNetwork();
     var hist = net.degreeHistogram;
     var stats = DATA.networkStats[state.network];
+    var counts = hist.counts;
 
-    $("degree-sub").textContent = "How many respondents have each number of connections, in the " +
-      NET_LABEL[state.network].toLowerCase() + " network.";
+    $("degree-sub").textContent = "How many people have at least k connections in the " +
+      NET_LABEL[state.network].toLowerCase() + " network. Shown on log-log axes.";
 
     var W = 640, H = 300;
-    var box = { x: PAD.left, y: PAD.top, w: W - PAD.left - PAD.right, h: H - PAD.top - PAD.bottom };
+    var box = { x: PAD.left + 6, y: PAD.top, w: W - PAD.left - PAD.right - 6, h: H - PAD.top - PAD.bottom };
     var colour = token(NET_SLOT[state.network]);
 
-    if (state.degreeScale === "linear") {
-      var counts = hist.counts;
-      var maxCount = Math.max.apply(null, counts);
-      var yTicks = niceTicks(0, maxCount, 4);
-      var yMax = yTicks[yTicks.length - 1];
-      var yScale = function (v) { return box.y + box.h - (v / yMax) * box.h; };
-      var band = box.w / counts.length;
-      var barWidth = Math.min(band - 2, 24);       // 2px surface gap, capped at 24px
-      var xScale = function (k) { return box.x + band * k + band / 2; };
+    var n = stats.n_nodes;
+    var ccdf = [];
+    for (var k = 0; k < counts.length; k++) {
+      var tail = 0;
+      for (var j = k; j < counts.length; j++) tail += counts[j];
+      if (tail > 0) ccdf.push({ k: k, prob: tail / n });
+    }
 
-      var xTicks = [];
-      for (var k = 0; k < counts.length; k += Math.max(1, Math.round(counts.length / 9))) xTicks.push(k);
+    var nonzero = ccdf.filter(function (p) { return p.k >= 1; });
+    if (!nonzero.length) nonzero = ccdf;
 
-      axisFrame(root, box, {
-        yScale: yScale, yTicks: yTicks, xScale: xScale, xTicks: xTicks,
-        xTitle: "Degree k (number of connections)", yTitle: "Respondents"
-      });
+    var maxK = Math.max.apply(null, nonzero.map(function (p) { return p.k; }));
+    var maxP = Math.max.apply(null, nonzero.map(function (p) { return p.prob; }));
+    var minP = Math.min.apply(null, nonzero.map(function (p) { return p.prob; }));
 
-      counts.forEach(function (count, degree) {
-        if (!count) return;
-        var h = box.y + box.h - yScale(count);
-        var x = xScale(degree) - barWidth / 2;
-        root.appendChild(svg("rect", {
-          class: "mark", x: x, y: yScale(count), width: barWidth, height: h,
-          rx: Math.min(4, barWidth / 2), fill: colour
-        }));
-        // square the bar off at the baseline: the rounded end belongs at the data end only
-        if (h > 4) {
-          root.appendChild(svg("rect", {
-            class: "mark", x: x, y: yScale(count) + h - 4, width: barWidth, height: 4, fill: colour
-          }));
-        }
-        root.appendChild(svg("rect", {
-          class: "hit", x: xScale(degree) - Math.max(band / 2, 12), y: box.y,
-          width: Math.max(band, 24), height: box.h,
-          onpointermove: function (event) {
-            showTip(event, "Degree " + degree, [
-              ["Respondents", String(count)],
-              ["Share of class", pct(count / stats.n_nodes, 1)]
-            ], null, colour);
-          },
-          onpointerleave: hideTip
-        }));
-      });
+    var logMaxK = Math.log10(Math.max(maxK, 2) * 1.3);
+    var logMaxP = Math.log10(maxP * 1.5);
+    var logMinP = Math.log10(Math.max(minP * 0.5, 1 / (n * 2)));
 
-      // the one bar worth naming: the isolates. Set beside the bar, not above
-      // it. At k = 0 the bar reaches the top of the plot, so a label above it
-      // would climb out of the chart and into the card heading.
-      if (counts[0]) {
-        root.appendChild(svg("text", {
-          class: "value-label",
-          x: xScale(0) + barWidth / 2 + 7,
-          y: yScale(counts[0]) + 11,
-          "text-anchor": "start",
-          text: counts[0] + " with no edge"
-        }));
-      }
-    } else {
-      var points = hist.loglog;
-      var maxK = Math.max.apply(null, points.map(function (p) { return p.k; }));
-      var maxC = Math.max.apply(null, points.map(function (p) { return p.count; }));
-      var lx = function (k) { return box.x + (Math.log10(k) / Math.log10(maxK * 1.15)) * box.w; };
-      var ly = function (c) { return box.y + box.h - (Math.log10(c) / Math.log10(maxC * 1.3)) * box.h; };
+    var lx = function (val) { return box.x + (Math.log10(Math.max(val, 0.5)) / logMaxK) * box.w; };
+    var ly = function (val) {
+      var logVal = Math.log10(Math.max(val, 1 / (n * 2)));
+      return box.y + box.h - ((logVal - logMinP) / (logMaxP - logMinP)) * box.h;
+    };
 
-      var decadeY = [1, 2, 5, 10, 20].filter(function (v) { return v <= maxC * 1.3; });
-      var decadeX = [1, 2, 5, 10, 20, 35].filter(function (v) { return v <= maxK * 1.15; });
+    var decadeX = [1, 2, 5, 10, 20, 50].filter(function (v) { return v <= maxK * 1.3; });
+    var decadeY = [];
+    var yVal = 0.01;
+    while (yVal <= maxP * 1.5) {
+      if (yVal >= minP * 0.5) decadeY.push(yVal);
+      yVal *= 10;
+    }
+    if (!decadeY.length) decadeY = [0.1, 1];
+    decadeY.push(1);
+    decadeY = decadeY.filter(function (v, i, arr) { return arr.indexOf(v) === i && v <= 1.01; });
 
-      axisFrame(root, box, {
-        yScale: ly, yTicks: decadeY, xScale: lx, xTicks: decadeX,
-        xTitle: "Degree k (log)", yTitle: "Respondents (log)"
-      });
+    axisFrame(root, box, {
+      yScale: ly, yTicks: decadeY, xScale: lx, xTicks: decadeX,
+      xTitle: "Degree k (log scale)",
+      yTitle: "P(K ≥ k)",
+      yFormat: function (t) { return t >= 1 ? "1" : t >= 0.1 ? fmt(t, 1) : fmt(t, 2); }
+    });
 
-      points.forEach(function (point) {
-        var cx = lx(point.k), cy = ly(point.count);
-        root.appendChild(svg("circle", {
-          class: "mark", cx: cx, cy: cy, r: 5.5, fill: colour,
-          stroke: token("--surface"), "stroke-width": 2
-        }));
-        root.appendChild(svg("circle", {
-          class: "hit", cx: cx, cy: cy, r: 13,
-          onpointermove: function (event) {
-            showTip(event, "Degree " + point.k, [["Respondents", String(point.count)]], null, colour);
-          },
-          onpointerleave: hideTip
-        }));
-      });
-
-      root.appendChild(svg("text", {
-        class: "axis-title", x: box.x + box.w, y: box.y + 4, "text-anchor": "end",
-        text: "isolates (k = 0) cannot be plotted on a log axis"
+    var pathParts = nonzero.map(function (p) {
+      return lx(p.k) + " " + ly(p.prob);
+    });
+    if (pathParts.length > 1) {
+      root.appendChild(svg("path", {
+        class: "mark",
+        d: "M" + pathParts.join("L"),
+        fill: "none", stroke: colour, "stroke-width": 2.5,
+        "stroke-linejoin": "round", "stroke-linecap": "round", opacity: 0.6
       }));
     }
 
-    setTable("degree-table",
-      ["Degree k", "Respondents", "Share of class"],
-      hist.counts.map(function (count, degree) {
-        return [degree, count, pct(count / stats.n_nodes, 1)];
-      }).filter(function (row) { return row[1] > 0; }));
+    nonzero.forEach(function (p) {
+      var cx = lx(p.k), cy = ly(p.prob);
+      root.appendChild(svg("circle", {
+        class: "mark", cx: cx, cy: cy, r: 5.5, fill: colour,
+        stroke: token("--surface"), "stroke-width": 2
+      }));
+      root.appendChild(svg("circle", {
+        class: "hit", cx: cx, cy: cy, r: 13,
+        onpointermove: function (event) {
+          var atLeast = Math.round(p.prob * n);
+          showTip(event, "Degree ≥ " + p.k, [
+            ["Respondents", String(atLeast) + " of " + n],
+            ["P(K ≥ " + p.k + ")", fmt(p.prob, 3)]
+          ], null, colour);
+        },
+        onpointerleave: hideTip
+      }));
+    });
 
-    var isolated = hist.counts[0] || 0;
+    var isolated = counts[0] || 0;
+    if (isolated > 0) {
+      root.appendChild(svg("text", {
+        class: "axis-title", x: box.x + box.w, y: box.y + 14, "text-anchor": "end",
+        text: isolated + " isolates (k = 0) at P = 1.00"
+      }));
+    }
+
     var top = net.nodes.slice().sort(function (a, b) { return b.degree - a.degree; })[0];
     $("degree-note").textContent =
-      "Strongly right-skewed: " + isolated + " of " + stats.n_nodes + " respondents have no edge at all, " +
-      "while respondent " + top.id + " has " + top.degree + ". " +
-      "The mean of " + fmt(stats.avg_degree, 1) + " describes almost nobody, because the distribution has no bulk in the middle.";
+      "Most people have very few connections. " + isolated + " of " + n + " have none at all. " +
+      "Respondent " + top.id + " has the most with " + top.degree + ". " +
+      "The average of " + fmt(stats.avg_degree, 1) + " connections does not describe a typical person here because a few people have many and most have few.";
   }
 
   // ---- centrality leaderboard --------------------------------------
@@ -1586,141 +1556,15 @@
       text: CENTRALITY_LABEL[state.centrality] + " centrality"
     }));
 
-    setTable("central-table",
-      ["Rank", "Respondent", CENTRALITY_LABEL[state.centrality], "Degree", "Community"],
-      top.map(function (node, i) {
-        return [i + 1, node.id, fmt(node.c[slot], 4), node.degree, node.community];
-      }));
-
     var ranks = net.ranks;
     var byDegree = net.nodes.slice().sort(function (a, b) { return b.c[0] - a.c[0]; })[0];
     var byBetween = net.nodes.slice().sort(function (a, b) { return b.c[2] - a.c[2]; })[0];
     $("central-note").textContent = byDegree.id === byBetween.id
-      ? "The same respondent (" + byDegree.id + ") leads both degree and betweenness here."
-      : "Degree and betweenness disagree: respondent " + byDegree.id + " has the most connections, but " +
-        "respondent " + byBetween.id + ", ranked #" + ranks.degree_centrality[byBetween.id] +
-        " on degree, carries the most shortest paths. Best connected and most important as a bridge " +
-        "are different people here.";
-  }
-
-  // ---- community x topic heatmap ------------------------------------
-
-  function renderHeat() {
-    var host = clear($("heat"));
-    var legend = clear($("heat-legend"));
-    var net = currentNetwork();
-    var topics = DATA.meta.topics;
-    var groups = net.communities.filter(function (group) { return group.size >= 3; });
-    var slots = graph.communitySlots();
-
-    $("heat-title").textContent = "Community × topic in the " + NET_LABEL[state.network].toLowerCase() +
-      " network, deviation from the class mean";
-
-    if (!groups.length) {
-      host.appendChild(el("p", { class: "inspector__empty", text: "No community in this network reaches three members." }));
-      return;
-    }
-
-    // one shared scale across every cell, so colours compare across the grid
-    var half = 0;
-    groups.forEach(function (group) {
-      topics.forEach(function (topic) {
-        half = Math.max(half, Math.abs(group.topicMeans[topic.toLowerCase()] - DATA.population[topic.toLowerCase()]));
-      });
-    });
-    half = half || 1;
-
-    host.style.gridTemplateColumns = "132px repeat(" + topics.length + ", minmax(84px, 1fr))";
-
-    host.appendChild(el("div", { class: "heat__head", text: "" }));
-    topics.forEach(function (topic) {
-      host.appendChild(el("div", { class: "heat__head", text: topic }));
-    });
-
-    var rows = [];
-    groups.forEach(function (group) {
-      host.appendChild(el("div", { class: "heat__side" }, [
-        el("span", { class: "chip" }, [
-          el("span", {
-            class: "key",
-            style: {
-              background: slots[group.id].fill,
-              boxShadow: slots[group.id].outlined ? "inset 0 0 0 1.5px var(--ink)" : "none"
-            }
-          }),
-          "Group " + group.id
-        ]),
-        el("span", { style: { color: "var(--ink-3)", marginLeft: "6px" }, text: group.size + " people" })
-      ]));
-
-      var row = ["Community " + group.id + " (n=" + group.size + ")"];
-      topics.forEach(function (topic) {
-        var key = topic.toLowerCase();
-        var mean = group.topicMeans[key];
-        var population = DATA.population[key];
-        var delta = mean - population;
-
-        row.push(signed(delta, 2));
-        host.appendChild(el("button", {
-          type: "button",
-          class: "heat__cell",
-          text: signed(delta, 2),
-          "aria-label": "Community " + group.id + ", " + topic + ": " + signed(delta, 2) + " from the class mean",
-          style: { background: divergingColour(delta, 0, half), color: inkOn(delta, 0, half) },
-          onpointermove: function (event) {
-            showTip(event, "Community " + group.id + " · " + topic, [
-              ["Group mean", fmt(mean, 2)],
-              ["Class mean", fmt(population, 2)],
-              ["Difference", signed(delta, 2)],
-              ["Group size", String(group.size)]
-            ], "Scores run −2 to +2");
-          },
-          onpointerleave: hideTip,
-          onclick: function () {
-            state.colourBy = "community";
-            state.highlightCommunity = group.id;
-            buildSegment("colour-mode", [
-              { value: "community", label: "Community" },
-              { value: "opinion", label: "Opinion" }
-            ], "community", function (value) {
-              state.colourBy = value;
-              state.highlightCommunity = null;
-              renderLegend();
-              graph.draw();
-            });
-            renderLegend();
-            graph.draw();
-            $("explorer").scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }));
-      });
-      rows.push(row);
-    });
-
-    [["Below the class mean", token("--div-low")], ["At it", token("--div-mid")], ["Above", token("--div-high")]]
-      .forEach(function (pair) {
-        legend.appendChild(el("span", { class: "legend__item" }, [
-          el("span", { class: "legend__key legend__key--rect", style: { background: pair[1] } }),
-          pair[0]
-        ]));
-      });
-
-    setTable("heat-table", ["Community"].concat(topics), rows);
-
-    var positive = 0, total = 0;
-    groups.forEach(function (group) {
-      topics.forEach(function (topic) {
-        total += 1;
-        if (group.topicMeans[topic.toLowerCase()] > 0) positive += 1;
-      });
-    });
-    var permutation = DATA.dynamics.nullmodels.community_permutation["4 topic means"];
-    $("heat-note").textContent =
-      (positive === total ? "All " : "Most of the ") + total +
-      " group-topic means are positive in absolute terms. These groups differ in how strongly they " +
-      "agree, not in what they agree with. A permutation test on the four topic means does not " +
-      "separate them (p = " + fmt(permutation.p_value_one_sided, 3) +
-      "), so read the grid as a description of the communities rather than a definition of them.";
+      ? "Respondent " + byDegree.id + " has both the most connections and sits on the most shortest paths."
+      : "The most connected person (" + byDegree.id + ") is not the best bridge. " +
+        "Respondent " + byBetween.id + " (ranked #" + ranks.degree_centrality[byBetween.id] +
+        " by connections) sits on the most shortest paths between others. " +
+        "Having many connections and being important for the flow of information are different things here.";
   }
 
   // ---- five networks side by side ------------------------------------
@@ -1808,21 +1652,10 @@
       ]));
     });
 
-    setTable("compare-table",
-      ["Network", "Nodes", "Edges", "Giant component", "Clustering", "Modularity Q", "Isolates", "Components"],
-      DATA.meta.networks.map(function (name) {
-        var stats = DATA.networkStats[name];
-        return [
-          NET_LABEL[name], stats.n_nodes, stats.n_edges, pct(stats.giant_fraction),
-          fmt(stats.avg_clustering, 3), fmt(DATA.networks[name].community.modularity, 3),
-          stats.n_isolated, stats.n_components
-        ];
-      }));
-
     $("compare-note").textContent =
-      "Technology and Education hold together; Ethics and Environment shatter. The class actually agrees " +
-      "more about ethics on average, just far less consistently. Cosine similarity reads the pattern of " +
-      "someone's answers rather than their level, so a topic with more spread loses edges at the same cut.";
+      "Technology and Education networks stay well connected. Ethics and Environment fall apart. " +
+      "People actually agree more on ethics on average, but their answers vary more from person to person. " +
+      "Our similarity measure looks at the pattern of answers, not the average. So a topic where people answer in many different ways produces fewer connections.";
   }
 
   // ---- DeGroot: where opinions settle ---------------------------------
@@ -1833,9 +1666,9 @@
     var degroot = DATA.dynamics.degroot[state.network];
 
     $("degroot-sub").textContent =
-      "Every respondent repeatedly replaces their opinion with the average of their neighbours'. " +
-      "The core collapses onto one number in " + degroot.steps_to_converge_giant +
-      " steps. Everyone with no edge stays exactly where they started.";
+      "Each person updates their opinion to the average of their neighbours' opinions, over and over. " +
+      "The connected group reaches agreement in " + degroot.steps_to_converge_giant +
+      " steps. People with no connections never change.";
 
     var W = 640, H = 300;
     var box = { x: 46, y: 46, w: W - 46 - 30, h: H - 46 - 62 };
@@ -1890,7 +1723,7 @@
             ["Starts at", fmt(graph.opinionOf(node), 2)],
             ["Settles at", fmt(node.degroot, 2)],
             ["Moves by", signed(node.degroot - graph.opinionOf(node), 2)]
-          ], node.isolate ? "No neighbours, so this dot never updates" : "Click to inspect", colour);
+          ], node.isolate ? "No connections, so this person never changes" : "Click to inspect", colour);
         },
         onpointerleave: hideTip
       }));
@@ -1916,20 +1749,12 @@
       ]);
     })));
 
-    setTable("degroot-table",
-      ["Respondent", "Starts at", "Settles at", "Moves by", "Has edges"],
-      net.nodes.slice().sort(function (a, b) { return graph.opinionOf(a) - graph.opinionOf(b); })
-        .map(function (node) {
-          return [node.id, fmt(graph.opinionOf(node), 2), fmt(node.degroot, 2),
-            signed(node.degroot - graph.opinionOf(node), 2), node.isolate ? "no" : "yes"];
-        }));
-
     $("degroot-note").textContent =
-      "The core agrees on " + fmt(degroot.consensus_giant, 2) + ", but that is a consensus among " +
+      "The connected group settles on " + fmt(degroot.consensus_giant, 2) + ", but that is only " +
       degroot.giant_size + " of " + DATA.meta.n_respondents + " people. " +
-      "The class as a whole never reaches one number, because " + degroot.n_isolated +
-      " respondents have nobody to average with. Convergence takes " + degroot.steps_to_converge_giant +
-      " steps here, set by the spectral gap (SLEM " + fmt(degroot.slem, 2) + ").";
+      "The whole class never agrees on one number because " + degroot.n_isolated +
+      " people have no connections and never update. It takes " + degroot.steps_to_converge_giant +
+      " rounds to settle. The speed depends on the second-largest eigenvalue of the weight matrix (SLEM = " + fmt(degroot.slem, 2) + ").";
   }
 
   // ---- SIS sweep -------------------------------------------------------
@@ -2013,16 +1838,12 @@
 
     var head = ["λ / λc"].concat(names.map(function (n) { return NET_LABEL[n] + " prevalence"; }));
     var first = sweeps[names[0]];
-    setTable("sis-table", head, first.x_ratio_over_threshold.map(function (x, i) {
-      return [fmt(x, 2)].concat(names.map(function (n) { return pct(sweeps[n].y_prevalence[i], 1); }));
-    }));
-
     var ratio = DATA.dynamics.epidemic.sweeps.overall.measured_threshold_over_predicted;
     $("sis-note").textContent =
-      "Both curves stay flat at zero well past the predicted threshold and only lift off around " +
-      fmt(ratio, 2) + "× λc. The spectral bound is a bound: it says an outbreak is impossible below λc, " +
-      "not that one happens above it. On 87 nodes with a core of ~50, stochastic die-out keeps prevalence " +
-      "at zero through the gap.";
+      "Both curves stay at zero well past the predicted threshold. Infection only takes hold around " +
+      fmt(ratio, 2) + "× λc. The threshold is a lower bound. It tells you outbreaks are impossible below it, " +
+      "but does not promise one will happen right above it. With only 87 people and a connected core of about 50, " +
+      "the infection randomly dies out before it can spread, even at rates above the threshold.";
   }
 
   // ---- threshold sensitivity --------------------------------------------
@@ -2132,23 +1953,14 @@
       onpointerleave: function () { crosshair.setAttribute("opacity", 0); hideTip(); }
     }));
 
-    setTable("sens-table",
-      ["Quantile"].concat(names.map(function (n) { return NET_LABEL[n]; })),
-      xs.map(function (q, i) {
-        return [fmt(q, 2)].concat(names.map(function (name) {
-          var value = sweeps[name][state.sensMeasure][i];
-          return state.sensMeasure === "y_giant_fraction" ? pct(value, 1) : fmt(value, 3);
-        }));
-      }));
-
     var ordering = DATA.dynamics.thresholdSensitivity.topic_ordering_holds_at_every_cut;
     var holds = Object.keys(ordering).every(function (key) { return ordering[key]; });
     $("sens-note").textContent =
-      "The 10% cut-off sets the scale but not the story: " +
+      "Changing the cut-off changes the numbers but not the pattern. " +
       (holds
-        ? "Technology stays better connected than Environment, and Education than Ethics, at every single quantile from 0.50 to 0.99."
-        : "the topic ordering does not survive every cut. See report/VARUN.md.") +
-      " No quantile in the range removes the isolates entirely, so a solitary group is a fact about these opinions, not an artefact of the threshold.";
+        ? "Technology always has a more connected network than Environment, and Education more than Ethics, at every cut-off from 0.50 to 0.99."
+        : "The topic ordering does not hold at every cut-off. See report/VARUN.md for details.") +
+      " No matter where you set the cut-off, some people stay isolated. That is a real feature of these opinions, not something the threshold creates.";
   }
 
   // ---- null models -------------------------------------------------------
@@ -2190,7 +2002,7 @@
       fill: token("--ink-3"), opacity: 0.09
     }));
     root.appendChild(svg("text", {
-      class: "axis-title", x: xScale(0), y: box.y - 6, "text-anchor": "middle", text: "indistinguishable from the null (|z| < 2)"
+      class: "axis-title", x: xScale(0), y: box.y - 6, "text-anchor": "middle", text: "looks random (|z| < 2)"
     }));
 
     var rows = stats.length * models.length;
@@ -2255,14 +2067,11 @@
       ]));
     });
 
-    setTable("null-table", ["Comparison", "Real", "Null mean", "Null s.d.", "z", "p"], tableRows);
-
     $("null-note").textContent =
-      "Against Erdős–Rényi every measure is off the scale, but that only says the network is not a " +
-      "random graph of the same density, which was never in doubt. The configuration model is the " +
-      "informative one. Hold each respondent's degree fixed and the clustering, the giant component and " +
-      "the modularity all land inside the null band. Once you know how many similar peers each person " +
-      "has, the rest of the structure follows.";
+      "Compared to a plain random graph (Erdos-Renyi), everything looks different. But that just means our network is not random, which we already knew. " +
+      "The useful comparison is the configuration model. It keeps each person's exact number of connections but rewires them randomly. " +
+      "Against that, clustering, the giant component, and modularity all look normal. " +
+      "Once you know how many connections each person has, the rest of the structure is what you would expect by chance.";
   }
 
   // ---- findings ------------------------------------------------------
@@ -2281,41 +2090,42 @@
         lead: true,
         // scoped to the overall network on purpose: the isolated-vs-connected
         // test behind this claim was run on all 60 questions, not per topic
-        title: "The core is a behaviour, not a faction",
+        title: "The connected group shares a habit, not a belief",
         text: "In the overall network the " +
           Math.round(DATA.networkStats.overall.giant_fraction * DATA.networkStats.overall.n_nodes) +
-          " connected respondents are not a cross-section: they are the people who answer agree or strongly " +
-          "agree almost everywhere, which is what makes their 60-dimensional vectors cosine-similar. The " +
+          " connected people are not a random slice of the class. They are the ones who tend to agree or strongly " +
+          "agree on most questions. That pattern of similar answers is what creates their connections. The " +
           DATA.networkStats.overall.n_isolated +
-          " isolates are the more mixed, more neutral answerers, not radicals being excluded."
+          " people with no connections gave more mixed or neutral answers. They are not extreme, they are just less predictable."
       },
       {
-        title: "Cohesion tracks spread, not agreement",
-        text: "Ethics and Environment draw the strongest average agreement of the four topics and produce " +
-          "the most broken networks. Cosine similarity reads the shape of an answer pattern rather than its " +
-          "level, so the topics people feel strongly and variably about are the ones that fragment first."
+        title: "More agreement does not mean more connections",
+        text: "Ethics and Environment have the highest average agreement among the four topics, but they produce " +
+          "the most disconnected networks. Our similarity measure looks at the pattern of answers, not how strongly " +
+          "people agree. Topics where people answer in many different ways lose connections, even if most people lean the same direction."
       },
       {
-        title: "There is no consensus for the class",
-        text: "Averaging dynamics pull the core onto " + fmt(degroot.consensus_giant, 2) + " within " +
-          degroot.steps_to_converge_giant + " steps, but " + degroot.n_isolated +
-          " respondents have no neighbour to average with and stay exactly where they started. " +
-          "A connected majority agreeing is not the same thing as the class agreeing."
+        title: "The whole class never agrees",
+        text: "When connected people average opinions with their neighbours, they settle on " + fmt(degroot.consensus_giant, 2) + " in " +
+          degroot.steps_to_converge_giant + " steps. But " + degroot.n_isolated +
+          " people have no connections and never change their opinion. " +
+          "The connected majority reaching agreement is not the same as the whole class reaching agreement."
       },
       {
-        title: "The degree sequence explains it",
-        text: "Against a configuration model of the overall network that preserves every respondent's " +
-          "degree, clustering (z = " +
+        title: "The number of connections explains everything else",
+        text: "We built 500 random networks that keep each person's exact number of connections but rewire them randomly. " +
+          "Clustering (z = " +
           fmt(conf.avg_clustering.z_score, 2) + "), the giant component (z = " +
-          fmt(conf.giant_fraction.z_score, 2) + ") and modularity (z = " +
-          fmt(conf.modularity.z_score, 2) + ") are all ordinary. Once you know how many similar peers each " +
-          "person has, the rest of the structure follows."
+          fmt(conf.giant_fraction.z_score, 2) + "), and modularity (z = " +
+          fmt(conf.modularity.z_score, 2) + ") all look normal compared to those random networks. " +
+          "Once you know how many connections each person has, the rest of the structure is what you would expect by chance."
       }
     ];
 
-    cards.forEach(function (card) {
+    var colours = ["finding--blue", "finding--orange", "finding--green", "finding--pink"];
+    cards.forEach(function (card, i) {
       host.appendChild(el("article", {
-        class: "finding" + (card.lead ? " finding--lead" : "")
+        class: "finding " + (colours[i] || "finding--blue")
       }, [
         el("h3", { text: card.title }),
         el("p", { text: card.text })
@@ -2356,7 +2166,6 @@
     renderProfile();
     renderDegree();
     renderCentrality();
-    renderHeat();
     renderCompare();
     renderDeGroot();
     renderSIS();
@@ -2373,7 +2182,6 @@
     initSegments();
     initSearch();
     initSectionNav();
-    wireTableToggles();
     graph.init();
     renderAll();
   }
