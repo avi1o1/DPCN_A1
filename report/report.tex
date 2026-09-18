@@ -16,10 +16,7 @@
 \usepackage{titlesec}
 \usepackage{enumitem}
 \usepackage{caption}
-\usepackage{subcaption}
 \usepackage{fancyhdr}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
 \usepackage[colorlinks=true,linkcolor=accent,urlcolor=accent,citecolor=accent]{hyperref}
 
 % ---------- palette ----------
@@ -70,10 +67,15 @@
   \large\normalfont A similarity network built from a class survey on \\
   Technology, Education, Ethics, and Environment}
 
-\author{Aviral \and Varun \and Arihant}
+\author{%
+  Aviral Gupta \\ \normalsize 2023111023
+  \and
+  Varun Shastry \\ \normalsize 2023112005
+  \and
+  Arihant Tripathy \\ \normalsize 2023111026}
 
 \date{DPCN, Assignment 1 \\[0.35em]
-  Team: \team \\[0.35em]
+  Team \team \\[0.35em]
   \url{https://github.com/avi1o1/DPCN_A1}}
 
 \maketitle
@@ -81,123 +83,98 @@
 % ============================================================
 \section*{Overview}
 
-\lab{Task:} build a network from a class survey on four topics, then analyse it.
+\lab{Task} We build a network from a class survey that covers four topics and
+then study that network.
 
-\lab{Approach:} a respondent is a node. An edge joins two people whose survey
-answers are similar. Three sets of analysis run on that network.
+\lab{Approach} Each respondent is one node. We put an edge between two people
+when their survey answers are similar. We then study the network in three ways.
 
 \begin{dash}
-  \item \emph{Structure.} Degree, clustering, components, four centralities,
-  and Louvain communities.
-  \item \emph{Dynamics.} The DeGroot opinion average and an SIS contagion, both
-  from the course.
-  \item \emph{Null models.} Erd\H{o}s--R\'enyi, a degree-preserving rewiring, and
-  a label permutation. These test whether the structure is more than chance.
+  \item \emph{Structure} We measure degree, clustering, components, four
+  centralities, and Louvain communities.
+  \item \emph{Dynamics} We run the DeGroot opinion average and an SIS
+  contagion model from the course.
+  \item \emph{Null models} We compare the network with an
+  Erd\H{o}s--R\'enyi graph, a degree-preserving rewiring, and a label
+  permutation. This helps us check whether the structure is more than chance.
 \end{dash}
 
-\lab{Headline:} 51 of the 87 respondents (59\%) form one connected group. The
-other 36 have no strong-similarity partner at all.
+\lab{Headline} 51 of the 87 respondents, which is 59\%, fall into one
+connected group. The other 36 do not have any strong-similarity partner.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.90\linewidth]{../figures/dashboard/overview.png}
-  \caption{The interactive dashboard. It opens in any browser and needs no
-  server. The network picker changes every number, chart, and diagram to the
-  chosen network.}
+  \includegraphics[width=\linewidth]{../figures/report/overview.pdf}
+  \caption{\textbf{(a)} How the 87 respondents divide into the giant component,
+  the remaining small components, and the isolates, for each of the five
+  networks. Technology and Education hold together at $75\%$ and $72\%$ in the
+  giant component. Ethics and Environment fall apart at $52\%$ and $51\%$.
+  \textbf{(b)} Empirical CDF of the mean opinion score, with the dotted rules at
+  the two group means. The respondents with no edge are the moderates. They
+  average $0.87$ against $1.31$ for the connected core.}
   \label{fig:overview}
 \end{figure}
 
 % ============================================================
 \section{Dataset Documentation}
 
-\lab{The raw survey:} 96 responses to 60 opinion statements, 15 in each of four
-topics. A letter code marks the topic: \textbf{T} Technology, \textbf{E}
-Education, \textbf{S} Ethics, \textbf{V} Environment. Each statement uses a
-five-point Likert scale, plus a ``No Comments'' option.
+\lab{The raw survey} The survey has 96 responses to 60 opinion statements.
+Each topic has 15 statements. The topic codes are \textbf{T} for Technology,
+\textbf{E} for Education, \textbf{S} for Ethics, and \textbf{V} for
+Environment. Each statement uses a five-point Likert scale along with a
+``No Comments'' option.
 
-\lab{Preparation:}
+\lab{Preparation}
 \begin{dash}
-  \item \emph{Likert to number.} Strongly Disagree $=-2$ through Strongly Agree
-  $=+2$. The scale is symmetric, so $0$ is a true neutral and a mean score
-  carries a direction and a strength at once.
-  \item \emph{``No Comments'' is missing, not neutral.} A refusal to answer is
-  not the same as being neutral. There are 62 blanks out of $87\times60=5220$
-  ($1.19\%$), spread over 19 respondents.
-  \item \emph{Quality filter.} Drop any respondent who answered fewer than half
-  of the 60 questions. This removes 9 responses and leaves \textbf{87
+  \item \emph{Likert to number} We convert Strongly Disagree to $-2$ and
+  Strongly Agree to $+2$. The scale is symmetric, so $0$ really means neutral.
+  The mean score then shows both direction and strength.
+  \item \emph{``No Comments'' means missing} We do not treat a skipped answer as
+  neutral. There are 62 blanks out of $87\times60=5220$ values, which is
+  $1.19\%$. These blanks come from 19 respondents.
+  \item \emph{Quality filter} We remove any respondent who answered fewer than
+  half of the 60 questions. This removes 9 responses and leaves \textbf{87
   respondents}.
-  \item \emph{Result.} An $87\times60$ table of scores in $[-2,+2]$, with a blank
-  for each ``No Comments''. Each question keeps its topic and its text.
+  \item \emph{Result} We get an $87\times60$ table of scores in $[-2,+2]$.
+  Each ``No Comments'' answer stays blank. Each question also keeps its topic
+  and its text.
 \end{dash}
 
-\lab{Missing values:} two rules are correct and both are used on purpose.
-\begin{dash}
-  \item Work that must agree with the graph replaces a blank with $0$ before
-  averaging. This is the step the edge builder uses, so opinions and edges come
-  from the same numbers.
-  \item Descriptive statistics drop the blank from a person's average instead.
-  \item The two rules differ by at most $0.01$ on the class mean, and by $0.23$
-  for one respondent. A number from one rule is never compared with a number
-  from the other.
-\end{dash}
+\lab{Missing values} We handle blanks in two ways depending on the calculation.
+When a result has to match the graph exactly, we replace a blank with $0$
+before averaging because the edge-building step also uses that rule. For
+descriptive statistics, we leave the blank out of that person's average. In
+practice the difference is very small. The class mean changes by at most $0.01$.
+The biggest change for any one respondent is $0.23$. We keep these two uses
+separate and do not compare numbers that come from different rules.
 
 % ============================================================
 \section{Pipeline Followed}
 
-\lab{Similarity:} each respondent becomes a vector of 60 answers,
-$\mathbf{x}_i\in[-2,2]^{60}$, with blanks set to $0$. The similarity of two
-people is the cosine of the angle between their vectors,
+\lab{Similarity} Each respondent becomes a vector of 60 answers,
+$\mathbf{x}_i\in[-2,2]^{60}$, with blanks set to $0$. We measure similarity
+between two people using the cosine of the angle between their vectors.
 \[
   s_{ij}=\frac{\mathbf{x}_i\cdot\mathbf{x}_j}
   {\lVert\mathbf{x}_i\rVert\,\lVert\mathbf{x}_j\rVert}\in[-1,1].
 \]
-The cosine rewards a shared pattern across all 60 questions. It does not reward
-a shared average level alone.
+Cosine similarity rewards a similar answer pattern across all 60 questions. It
+does not reward only a similar average score.
 
-\lab{Edges:} compute the full $87\times87$ cosine matrix, then keep the top
-\textbf{10\%} of pairs as edges. That is the 90th-percentile cut.
+\lab{Edges} We compute the full $87\times87$ cosine matrix and keep the top
+\textbf{10\%} of pairs as edges. This is the 90th percentile cut.
 \begin{dash}
-  \item A hard cut is necessary. Almost everyone in this class agrees on
-  average, so a loose threshold gives a near-complete graph with no information.
-  \item The rule keeps a fixed \emph{rank}, not a fixed score. It therefore
-  yields exactly \textbf{375 edges} every time, whatever the similarity
-  distribution looks like.
-  \item \textbf{Five networks} use the same rule. One \emph{overall} network uses
-  all 60 questions. Four use one topic each, 15 questions apiece.
-  \item Because node count, edge count, and density are identical across the
-  five, any difference between them is a wiring effect. Section~\ref{sec:sens}
-  tests the cut itself.
+  \item We need a hard cut. Most people in this class agree on average, so a
+  loose threshold would give us an almost complete graph with very little use.
+  \item This rule keeps a fixed \emph{rank} and not a fixed score. So it always
+  gives exactly \textbf{375 edges}, whatever the similarity values look like.
+  \item We build \textbf{five networks} with the same rule. One \emph{overall}
+  network uses all 60 questions. Four others use one topic each, with 15
+  questions each.
+  \item Node count, edge count, and density stay the same across all five
+  networks. So any difference between them comes from the wiring pattern.
+  Section~\ref{sec:sens} checks the cut itself.
 \end{dash}
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[
-  node distance=6mm and 6.5mm,
-  box/.style={rectangle, rounded corners=2pt, draw=accent, line width=0.6pt,
-    fill=soft, align=center, font=\sffamily\scriptsize, inner sep=3.5pt,
-    text width=19mm, minimum height=10mm},
-  outb/.style={box, fill=accent!12},
-  ar/.style={-{Stealth[length=2.2mm]}, line width=0.6pt, draw=accent!70}]
-\node[box] (raw) {Raw survey\\96$\times$60};
-\node[box, right=of raw] (clean) {Clean\\$\to[-2,2]$\\filter $\to$ 87};
-\node[box, right=of clean] (vec) {Opinion\\vectors};
-\node[box, right=of vec] (sim) {Cosine\\$87\times87$};
-\node[outb, right=of sim] (net) {Top 10\%\\5 networks\\375 edges};
-\draw[ar] (raw)--(clean); \draw[ar] (clean)--(vec);
-\draw[ar] (vec)--(sim); \draw[ar] (sim)--(net);
-\node[box, below=8mm of clean, xshift=6mm] (struct) {Structure};
-\node[box, below=8mm of sim, xshift=2mm] (dyn) {Dynamics\\+ null models};
-\node[box, below=8mm of net] (dash) {Dashboard};
-\draw[ar] (net.south) to[out=-90,in=90] (struct.north);
-\draw[ar] (net.south) to[out=-90,in=90] (dyn.north);
-\draw[ar] (net.south) -- (dash.north);
-\end{tikzpicture}
-\caption{The pipeline. Clean the survey, build the opinion vectors, compute the
-cosine matrix, cut the top 10\% of pairs into five networks. Structure,
-dynamics, and dashboard all read those saved networks. No later stage rebuilds
-the graph.}
-\label{fig:pipe}
-\end{figure}
 
 % ============================================================
 \section{Analysis and Visualizations}
@@ -205,15 +182,15 @@ the graph.}
 
 \subsection{Structure}
 
-\lab{Definitions:} \emph{degree} $k$ is the number of edges at a node.
-\emph{Density} is the fraction of possible edges present. \emph{Clustering}
-measures how often two neighbours of a node also connect to each other, on a
-scale of $0$ to $1$. A \emph{component} is a set of nodes that can all reach each
-other, and the largest one is the \emph{giant component}. \emph{Modularity} $Q$
-scores a grouping by how many more edges fall inside groups than a random graph
-with the same degrees would give.
+\lab{Definitions} \emph{Degree} $k$ is the number of edges attached to a node.
+\emph{Density} is the fraction of possible edges that are present.
+\emph{Clustering} measures how often two neighbours of a node are also linked
+to each other, on a scale from $0$ to $1$. A \emph{component} is a set of nodes
+that can all reach one another. The largest one is the \emph{giant component}.
+\emph{Modularity} $Q$ tells us how strongly the network splits into groups
+compared with a random graph that keeps the same degrees.
 
-\lab{Results:}
+\lab{Results}
 
 \begin{table}[htbp]
 \centering\small
@@ -233,81 +210,80 @@ Giant avg.\ path     & 1.88 & 2.20 & 2.24 & 1.78 & 1.93 \\
 Modularity $Q$       & 0.108 & 0.242 & \gc{0.263} & 0.151 & \rc{0.079} \\
 \bottomrule
 \end{tabular}
-\caption{Structural metrics per network. Node count, edge count, and density are
-identical by construction, so every other difference is an opinion effect.}
+\caption{Structural metrics for each network. Node count, edge count, and
+density are the same by construction. So the other differences come from the
+opinion pattern.}
 \label{tab:struct}
 \end{table}
 
-\lab{Analysis:}
+\lab{Analysis}
 \begin{dash}
   \item The overall network is sparse but locally dense. Density is $0.10$ and
-  clustering is $0.41$. Connected people sit in tight triangles.
-  \item \textbf{36 of 87 respondents are isolates.} An isolate has no
-  strong-similarity partner anywhere in the class.
+  clustering is $0.41$. So connected people often sit in tight triangles.
+  \item \textbf{36 of 87 respondents are isolates.} This means they do not have
+  any strong-similarity partner in the class.
   \item The giant component is compact. Two connected people are $1.88$ steps
-  apart on average, with a diameter of $4$.
-  \item The degree distribution is heavy-tailed. Respondent 114 has $k=35$ while
-  the mean is $8.6$, a value that fits almost nobody
-  (Figure~\ref{fig:structure}).
+  apart on average, and the diameter is $4$.
+  \item The degree distribution has a long tail. Respondent 114 has $k=35$
+  while the mean is only $8.6$. Very few people come close to that value, as
+  Figure~\ref{fig:structure} shows.
 \end{dash}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\linewidth]{../figures/dashboard/structure.png}
-  \caption{\emph{Left:} degree distribution on log-log axes as a complementary
-  CDF $P(K\ge k)$. The 36 isolates sit at $k=0$, which a log axis cannot draw, so
-  the chart states this rather than dropping them silently. \emph{Right:} the ten
-  most central respondents by degree.}
+  \includegraphics[width=\linewidth]{../figures/report/structure.pdf}
+  \caption{\textbf{(a)} Degree distribution of the overall network on log-log
+  axes, drawn as a complementary CDF $P(K\ge k)$. Only the 51 connected
+  respondents appear, because the 36 isolates have $k=0$ and a log axis cannot
+  show them. The dashed rule marks the mean degree, which sits well above the
+  median. \textbf{(b)} The ten most central respondents by degree centrality,
+  from $0.407$ for respondent 114 down to $0.302$ for respondent 49.}
   \label{fig:structure}
 \end{figure}
 
 \subsection{Centrality and communities}
 
-\lab{Definitions:} \emph{degree} centrality counts direct connections.
-\emph{Closeness} measures how short the average path is to everyone else.
-\emph{Betweenness} counts how often a node lies on a shortest path between two
-others, which rewards a bridge position. \emph{Eigenvector} centrality gives more
-weight to a node connected to other important nodes. \emph{Louvain} searches for
-the grouping with the highest modularity.
+\lab{Definitions} \emph{Degree} centrality counts direct connections.
+\emph{Closeness} measures how short the average path from one node is to the
+rest. \emph{Betweenness} counts how often a node lies on a shortest path
+between two others, so it highlights bridge positions. \emph{Eigenvector}
+centrality gives more weight to a node that is connected to other important
+nodes. \emph{Louvain} looks for the grouping with the highest modularity.
 
-\lab{Analysis:}
+\lab{Analysis}
 \begin{dash}
-  \item Degree, closeness, and eigenvector centrality pick almost the same five
-  people: 114, 67, 94, 105, 110. All five score above the class mean on every
-  topic. They are the uniform strong-agreement answerers, so their 60-value
-  vectors resemble many others.
-  \item Betweenness gives a different answer. Its top node is \textbf{41}, who has
-  a maximum Technology score but only an average Education score. That mixed
-  profile bridges sub-groups.
-  \item The most connected person and the best bridge are different people. One
-  centrality measure is not enough to describe importance here.
-  \item Louvain finds many small communities and a low modularity
-  ($Q=0.108$). Every community has a positive mean on every topic. Only one group
-  (C6) falls below the class mean anywhere, and only on Technology. These are
-  degrees of agreement, not opposing camps.
+  \item Degree, closeness, and eigenvector centrality mostly pick the same five
+  people, which are 114, 67, 94, 105, and 110. All five score above the class
+  mean on every topic. They are the people who agree strongly and consistently,
+  so their 60-value vectors look similar to many others.
+  \item Betweenness gives a different result. Its top node is \textbf{41}, who
+  has the maximum Technology score but only an average Education score. This
+  mixed profile helps that person connect sub-groups.
+  \item The most connected person and the best bridge are not the same. So one
+  centrality measure alone is not enough here.
+  \item Louvain finds many small communities and the modularity is low at
+  $Q=0.108$. Every community has a positive mean on every topic. Only one group,
+  C6, goes below the class mean anywhere, and that happens only on Technology.
+  These are different levels of agreement and not opposing camps.
 \end{dash}
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}{0.485\linewidth}
-    \includegraphics[width=\linewidth]{../figures/dashboard/network_overall_community.png}
-    \caption{Overall, coloured by community.}
-  \end{subfigure}\hfill
-  \begin{subfigure}{0.485\linewidth}
-    \includegraphics[width=\linewidth]{../figures/dashboard/network_technology_opinion.png}
-    \caption{Technology, coloured by opinion.}
-  \end{subfigure}
-  \caption{Node-link view, node size scaled by degree. The giant component sits
-  in the centre, small components ring it, isolates sit on the outer rim.
-  \textbf{(a)} The four largest Louvain communities are coloured, singletons and
-  pairs are grey. \textbf{(b)} Strong-agreement answerers (red) form the centre;
-  lukewarm answerers (blue) sit on the edge.}
+  \includegraphics[width=\linewidth]{../figures/report/networks.pdf}
+  \caption{Force-directed node-link views with node size scaled by degree. The
+  giant component is laid out in the centre, the remaining small components sit
+  on an inner ring, and the isolates sit on the outer ring.
+  \textbf{(a)} Overall network, coloured by Louvain community. The four largest
+  communities are coloured, while singletons and pairs are grey.
+  \textbf{(b)} Technology network, coloured by mean Technology score. People
+  with strong agreement, in red, stay near the centre. More lukewarm answerers,
+  in blue, stay near the edge.}
   \label{fig:nets}
 \end{figure}
 
 \subsection{Cohesion tracks opinion variance, not opinion strength}
 
-\lab{Observation:} the per-topic numbers run against the raw averages.
+\lab{Observation} The per-topic network results do not follow the raw averages.
 
 \begin{table}[htbp]
 \centering\small
@@ -322,38 +298,43 @@ Ethics      & 1.28 & 0.45 & 51.7\% & 42 \\
 Environment & \gc{1.37} & \rc{0.47} & \rc{50.6\%} & \rc{43} \\
 \bottomrule
 \end{tabular}
-\caption{The topics with the strongest average agreement have the most broken
-networks. The spread explains it, not the mean.}
+\caption{The topics with the strongest average agreement still have the most
+broken networks. The spread explains this better than the mean does.}
 \label{tab:variance}
 \end{table}
 
-\lab{Analysis:}
+\lab{Analysis}
 \begin{dash}
-  \item Ethics ($+1.28$) and Environment ($+1.37$) have the strongest average
-  agreement, yet the most broken networks at $52\%$ and $51\%$.
-  \item Technology ($+0.99$) and Education ($+0.91$) agree less on average, yet
-  stay the best connected at $75\%$ and $72\%$.
-  \item The cause is the spread. Cosine similarity depends on the pattern across
-  the 15 questions of a topic, not on the average level.
-  \item Technology and Education opinions are tightly grouped (s.d.\ $0.37$ and
-  $0.35$), so most vectors stay similar and the graph holds together. Ethics and
-  Environment are strong but spread out (s.d.\ $0.45$ and $0.47$), so the same
-  cut fragments them.
-  \item ``The class agrees more on Environment than on Technology'' is true of
-  the raw average and false of the network.
+  \item Ethics ($+1.28$) and Environment ($+1.37$) have the highest average
+  agreement, but their networks are the most broken at $52\%$ and $51\%$.
+  \item Technology ($+0.99$) and Education ($+0.91$) have lower average
+  agreement, but they stay the best connected at $75\%$ and $72\%$.
+  \item The main reason is the spread. Cosine similarity depends on the answer
+  pattern across the 15 questions in a topic and not just on the average level.
+  \item Technology and Education have tightly grouped opinions with standard
+  deviations of $0.37$ and $0.35$. So most vectors remain similar and the graph
+  stays together. Ethics and Environment have stronger means but they are more
+  spread out, with standard deviations of $0.45$ and $0.47$. So the same cut
+  breaks them more.
+  \item So the raw average can say that the class agrees more on Environment
+  than on Technology, but the network shows a different pattern.
 \end{dash}
 
 \subsection{Dynamics on the network}
 
-\lab{DeGroot:} give each respondent a start opinion, their mean score. At each
-step every respondent replaces it with the mean of their neighbours' opinions,
-all at the same time. The rule is $\mathbf{x}(t{+}1)=D^{-1}A\,\mathbf{x}(t)$.
-The eigenvalues of the update matrix decide the outcome. The course stability
-rule says a linear map is stable when the relevant eigenvalue has magnitude below
-$1$. The \emph{SLEM} (second-largest eigenvalue modulus) sets the speed, and the
-algebraic connectivity is $\lambda_2=1-\mu_2$.
+\lab{DeGroot} We start each respondent with their mean opinion score. At each
+step, every respondent replaces that value with the average of their
+neighbours' opinions, and everybody updates at the same time. The rule is
+$\mathbf{x}(t{+}1)=D^{-1}A\,\mathbf{x}(t)$. Here $\mathbf{x}(t)$ is the vector
+of opinion values of all respondents at step $t$. $A$ is the adjacency matrix
+of the network. $D$ is the diagonal degree matrix, so each diagonal entry is
+the degree of one node. The matrix $D^{-1}A$ therefore gives the neighbour
+average update. The eigenvalues of this update matrix decide what happens next.
+From the course, the map is stable when the relevant eigenvalue has magnitude
+below $1$. The \emph{SLEM}, which is the second-largest eigenvalue modulus,
+controls the speed. The algebraic connectivity is $\lambda_2=1-\mu_2$.
 
-\lab{Results:}
+\lab{Results}
 
 \begin{table}[htbp]
 \centering\small
@@ -369,50 +350,54 @@ Education   & 0.264 & 0.736 & 61 & 63 & \rc{1.275} \\
 Environment & \rc{0.229} & \rc{0.771} & \rc{77} & \rc{44} & 1.349 \\
 \bottomrule
 \end{tabular}
-\caption{DeGroot consensus. Every SLEM is below $1$, so every map is stable. The
-order of $\lambda_2$ matches the order of the measured steps with no exception.}
+\caption{DeGroot consensus. Every SLEM is below $1$, so every map is stable.
+The order of $\lambda_2$ matches the measured order of steps in every case.}
 \label{tab:degroot}
 \end{table}
 
-\lab{Analysis:}
+\lab{Analysis}
 \begin{dash}
   \item The overall network has 37 components, so there is no single class
   consensus. The 51-person core reaches \textbf{1.409} in \textbf{23 steps}.
-  \item The 36 isolates never move. An isolate has no neighbour to average with,
-  so its opinion at step 1000 equals its opinion at step 0.
-  \item Convergence speed follows the algebraic connectivity exactly across all
-  five networks. This is the course stability rule confirmed on survey data.
-  \item Edge weights have almost no effect. The weighted consensus is $1.4099$
-  against an unweighted $1.4085$. Row normalisation removes the narrow $0.85$ to
-  $0.95$ range of the kept similarities.
+  \item The 36 isolates never change. An isolate has no neighbour to average
+  with, so its opinion at step 1000 is the same as at step 0.
+  \item Convergence speed follows algebraic connectivity exactly across all five
+  networks. This matches the stability rule from the course on real survey
+  data.
+  \item Edge weights make almost no difference. The weighted consensus is
+  $1.4099$ and the unweighted one is $1.4085$. Row normalisation shrinks the
+  effect of the kept similarities because they already lie in the narrow range
+  from $0.85$ to $0.95$.
 \end{dash}
 
-\lab{SIS:} model a strong opinion as a contagion. An infected person infects each
-neighbour at rate $\beta$ and recovers at rate $\gamma$. The course result gives a
-critical ratio $(\beta/\gamma)_c = 1/\lambda_{\max}$, where $\lambda_{\max}$ is
-the largest eigenvalue of the adjacency matrix. A lower threshold means an opinion
-spreads more easily. Note this uses $A$ itself, not the row-normalised $D^{-1}A$,
-because an infected person infects each neighbour separately rather than
-averaging.
+\lab{SIS} We model a strong opinion like a contagion. An infected person can
+infect each neighbour at rate $\beta$ and recover at rate $\gamma$. From the
+course, the critical ratio is $(\beta/\gamma)_c = 1/\lambda_{\max}$, where
+$\lambda_{\max}$ is the largest eigenvalue of the adjacency matrix. A lower
+threshold means the opinion spreads more easily. This calculation uses $A$
+itself and not the row-normalised $D^{-1}A$, because one infected person can
+infect neighbours separately instead of averaging with them.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.78\linewidth]{../figures/dashboard/dynamics.png}
-  \caption{\emph{Left:} DeGroot. The connected core funnels onto $1.41$ while the
-  isolate lines stay flat. \emph{Right:} the simulated SIS transition begins at
-  about $1.6\times$ the predicted bound, which is expected because the mean-field
-  value is a lower bound and the core holds only 44 to 65 people.
-  \emph{Bottom:} the threshold sensitivity sweep.}
+  \includegraphics[width=\linewidth]{../figures/report/dynamics.pdf}
+  \caption{\textbf{(a)} DeGroot trajectories $x_i(t)$ on the overall network.
+  The connected core settles near $1.41$ while the 36 isolate lines stay flat.
+  \textbf{(b)} Simulated SIS prevalence against $\lambda/\lambda_c$. The
+  transition starts at about $1.6\times$ the predicted bound, which is expected
+  because the mean-field value is a lower bound and the core has only 44 to 65
+  people. \textbf{(c)} Giant-component share under the threshold sensitivity
+  sweep, with the $q=0.90$ cut used in this report marked.}
   \label{fig:dynamics}
 \end{figure}
 
 \subsection{Does the 10\% cut-off matter?}
 \label{sec:sens}
 
-\lab{Experiment:} apply the same rule at every quantile from $0.50$ to $0.99$ and
-record the structure at each one.
+\lab{Experiment} We apply the same rule at every quantile from $0.50$ to $0.99$
+and record the structure each time.
 
-\lab{Results:}
+\lab{Results}
 
 \begin{table}[htbp]
 \centering\small
@@ -428,34 +413,35 @@ record the structure at each one.
 0.50        & 1871 & \gc{8}  & \gc{90.8\%} & \rc{0.751} \\
 \bottomrule
 \end{tabular}
-\caption{Loosening the cut connects most of the isolates but never all of them,
-and inflates the clustering until the graph stops being informative.}
+\caption{A looser cut connects most of the isolates but never all of them. At
+the same time it increases clustering until the graph stops being very useful.}
 \label{tab:sens}
 \end{table}
 
-\lab{Analysis:}
+\lab{Analysis}
 \begin{dash}
-  \item The topic order is stable at every cut. Technology stays above
-  Environment and Education stays above Ethics, with no exception. That order is
-  a property of the data, not of the 90th percentile.
-  \item The isolates are only partly an artifact. Their count falls from 36 at
-  $q=0.90$ to 8 at $q=0.50$, and never reaches zero. Eight people stay below the
-  median similarity to every other person in the class.
-  \item A looser cut has a cost. At $q=0.50$ the clustering rises to $0.75$ and
-  the graph is half complete, so community detection and centrality stop meaning
-  much.
-  \item $q=0.90$ is therefore a tested compromise rather than an assumption.
+  \item The topic order stays stable at every cut. Technology always stays above
+  Environment and Education always stays above Ethics. So this order comes from
+  the data and not from the 90th percentile choice.
+  \item The isolates are only partly caused by the cut. Their count falls from
+  36 at $q=0.90$ to 8 at $q=0.50$, but it never becomes zero. So eight people
+  remain below the median similarity with everyone else in the class.
+  \item A looser cut also has a cost. At $q=0.50$ the clustering rises to $0.75$
+  and the graph becomes half complete. Then community detection and centrality
+  do not tell us much.
+  \item So $q=0.90$ is a tested compromise and not just an assumption.
 \end{dash}
 
 % ============================================================
 \section{Results and Discussion}
 \label{sec:results}
 
-\lab{What the network says about class opinions:} this class is agreeable. The
-mean opinion is positive on all four topics and the raw data shows no opposing
-camps. The network exposes structure that the averages hide.
+\lab{What the network says about class opinions} This class is broadly
+agreeable. The mean opinion is positive on all four topics and the raw data
+does not show opposing camps. The network still reveals structure that the
+averages do not show clearly.
 
-\lab{Finding 1. No global consensus, and the drop-outs are the moderates.}
+\lab{Finding 1. No global consensus and the drop-outs are the moderates}
 \begin{dash}
   \item Under DeGroot the 51-person core agrees at $1.409$ while the 36 isolates
   never move.
@@ -465,12 +451,12 @@ camps. The network exposes structure that the averages hide.
   causes.
 \end{dash}
 
-\lab{Finding 2. Cohesion is a variance story.} Technology and Education look
-better connected than Ethics and Environment despite lower mean scores, because
-their opinions are less spread out. Raw agreement and social cohesion are not the
-same measurement.
+\lab{Finding 2. Lower variance gives stronger cohesion} Technology and Education
+look better connected than Ethics and Environment even though their mean scores
+are lower. This happens because their opinions are less spread out. Raw
+agreement and social cohesion are not the same thing.
 
-\lab{Finding 3. Spread is easiest where the class is most broken.}
+\lab{Finding 3. More fragmented topics have lower SIS thresholds}
 
 \begin{table}[htbp]
 \centering\small
@@ -486,8 +472,8 @@ Technology  & 18.17 & 0.0550 & \gc{65} & 0.179 \\
 Education   & \rc{17.74} & \rc{0.0564} & 63 & \rc{0.191} \\
 \bottomrule
 \end{tabular}
-\caption{Epidemic thresholds. The order reverses the connectivity order in
-Table~\ref{tab:struct}. The most broken topic spreads most easily.}
+\caption{Epidemic thresholds. This order is the reverse of the connectivity
+order in Table~\ref{tab:struct}. The most broken topic spreads most easily.}
 \label{tab:epi}
 \end{table}
 
@@ -496,7 +482,7 @@ Table~\ref{tab:struct}. The most broken topic spreads most easily.}
   $0.0445$, yet they are the least connected topics.
   \item The edge count is fixed at 375, so a smaller giant component packs almost
   the same edges into fewer people. Environment puts 374 edges into 44
-  respondents; Technology spreads 373 across 65.
+  respondents. Technology spreads 373 across 65.
   \item A denser core raises $\lambda_{\max}$, which lowers the threshold. The
   standard bound $\langle k\rangle \le \lambda_{\max} \le k_{\max}$ applied inside
   the giant component predicts this ordering directly.
@@ -504,10 +490,10 @@ Table~\ref{tab:struct}. The most broken topic spreads most easily.}
   property of the data and also a warning about the fixed-edge method.
 \end{dash}
 
-\lab{Finding 4. The structure is in the degree sequence.} A null model asks
-whether a random network with no opinion structure gives the same value. The
-z-score is $z=(\text{real}-\text{null mean})/\text{null s.d.}$, and $|z|<2$ means
-the real value looks random.
+\lab{Finding 4. The structure sits in the degree sequence} A null model asks
+whether a random network with no opinion structure would give the same result.
+The z-score is $z=(\text{real}-\text{null mean})/\text{null s.d.}$. When
+$|z|<2$, the real value looks close to random.
 
 \begin{table}[htbp]
 \centering\small
@@ -522,9 +508,9 @@ Average path length & 1.880 & 2.292 & \rc{$-9.5$} & 1.834 & $+3.7$ \\
 Modularity          & 0.105 & 0.282 & \rc{$-13.7$} & 0.100 & \gc{$+0.9$} \\
 \bottomrule
 \end{tabular}
-\caption{The real network against 500 Erd\H{o}s--R\'enyi graphs of the same
-density and 500 degree-preserving rewirings of itself. Green marks a z-score
-inside the random band.}
+\caption{The real network is compared with 500 Erd\H{o}s--R\'enyi graphs of the
+same density and 500 degree-preserving rewirings of itself. Green marks a
+z-score inside the random band.}
 \label{tab:null}
 \end{table}
 
@@ -543,17 +529,18 @@ inside the random band.}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.86\linewidth]{../figures/dashboard/nullmodels.png}
-  \caption{Null-model z-scores on a symmetric-log axis. The shaded band is the
-  $|z|<2$ range that looks random. Erd\H{o}s--R\'enyi fails every measure. The
-  configuration model matches clustering, giant component, and modularity.}
+  \includegraphics[width=0.86\linewidth]{../figures/report/nullmodels.pdf}
+  \caption{Null-model z-scores on a symmetric-log axis. The shaded band shows
+  the $|z|<2$ range that looks random. Erd\H{o}s--R\'enyi fails on every
+  measure. The configuration model matches clustering, giant component, and
+  modularity.}
   \label{fig:null}
 \end{figure}
 
-\lab{Finding 5. The communities are real, but only at the fine grain.} A
-permutation test shuffles the community labels 10{,}000 times with the group sizes
-held fixed, then measures the opinion variance inside the groups. The p-value is
-the fraction of shuffles that beat the real grouping.
+\lab{Finding 5. The communities are real, but only at the fine level} A
+permutation test shuffles the community labels 10{,}000 times while keeping the
+group sizes fixed. It then measures the opinion variance inside the groups. The
+p-value is the fraction of shuffles that do better than the real grouping.
 
 \begin{table}[htbp]
 \centering\small
@@ -566,8 +553,8 @@ All 60 question scores & 0.4116 & 0.4592 & \gc{$-6.57$} & \gc{$<0.0001$} \\
 4 topic means          & 0.0791 & 0.0839 & \rc{$-1.26$} & \rc{$0.108$} \\
 \bottomrule
 \end{tabular}
-\caption{The same communities pass on the answers the graph was built from and
-fail on the coarser topic averages.}
+\caption{The same communities pass when we test the answers used to build the
+graph and fail when we test only the coarser topic averages.}
 \label{tab:perm}
 \end{table}
 
@@ -579,19 +566,22 @@ fail on the coarser topic averages.}
   \item Louvain groups people by their detailed answer pattern, not by their
   broad position on the four topics. Two people in one community can differ on
   topic averages while answering the individual questions alike.
-  \item The community-by-topic heatmap therefore \emph{describes} each group but
+  \item The community-by-topic comparison in Figure~\ref{fig:heatmap} therefore
+  \emph{describes} each group but
   does not \emph{define} it, and is not presented as a definition.
 \end{dash}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.54\linewidth]{../figures/community_topic_heatmap.png}
-  \caption{Mean score of each large community, per topic. Every cell is positive.
-  The communities raise or lower agreement rather than disagreeing.}
+  \includegraphics[width=0.78\linewidth]{../figures/report/heatmap.pdf}
+  \caption{Mean score of each large community for each topic, against the class
+  mean. Every value is positive and every community sits on the agreeing side
+  of the scale, so the communities differ in level of agreement and not in
+  direction.}
   \label{fig:heatmap}
 \end{figure}
 
-\lab{In summary:}
+\lab{In summary}
 \begin{dash}
   \item The class is agreeable across all four topics, with no real factions.
   \item Low variance drives the apparent cohesion, so Technology and Education
@@ -608,7 +598,7 @@ fail on the coarser topic averages.}
 % ============================================================
 \section{Individual Contribution}
 
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering\small
 \begin{tabular}{@{}p{0.13\linewidth}p{0.81\linewidth}@{}}
 \toprule
@@ -616,8 +606,8 @@ fail on the coarser topic averages.}
 \midrule
 \textbf{Aviral} &
 Cleaned and interpreted the survey data. Built all five networks with cosine
-similarity and the top-10\% cut. Ran the structural analysis: degree, clustering,
-components, the four centralities, and the Louvain communities. Produced the
+similarity and the top-10\% cut. Ran the structural analysis for degree,
+clustering, components, the four centralities, and the Louvain communities. Produced the
 static figures. Found the topic-variance result and the centrality result. \\
 \addlinespace
 \textbf{Varun} &
@@ -627,20 +617,14 @@ simulation. Built the Erd\H{o}s--R\'enyi and configuration null models. Ran the
 community permutation test and the edge-threshold sensitivity sweep. \\
 \addlinespace
 \textbf{Arihant} &
-Built the self-contained interactive dashboard: hand-drawn charts, a node-link
+Built the self-contained interactive dashboard with hand-drawn charts, a node-link
 view, all five networks, community and opinion colour, an isolate toggle, a
 respondent lookup, and the dynamics and null-model panels. Exported the dashboard
 data. Wrote this report and produced its figures. \\
 \bottomrule
 \end{tabular}
-\caption{Individual contributions. The commit history matches this split.}
+\caption{Individual contributions. The commit history supports this split.}
 \label{tab:contrib}
 \end{table}
-
-\lab{Reproducibility:} everything in this report comes from the linked
-repository. The pipeline runs as a fixed sequence of stages and writes its results
-to disk, so no figure or table is computed by hand. The dashboard is a single HTML
-file that opens in any browser with no server, no build step, and no network
-access.
 
 \end{document}

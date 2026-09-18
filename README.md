@@ -52,6 +52,14 @@ Open `dashboard/index.html` by double-clicking it. The page embeds its own data,
 no server and no network access. Sources are in `src/dashboard_template/`; never edit
 `dashboard/index.html` by hand, it is generated.
 
+Finally the report figures, which are a separate publication-styled set (serif, vector PDF,
+no in-figure titles) built from the same saved outputs:
+
+```bash
+python src/report_figures.py    # -> figures/report/*.pdf
+cd report && latexmk -pdf report.tex
+```
+
 ## Project layout
 
 ```
@@ -68,6 +76,7 @@ src/
   build_network.py        |  Aviral: cleaning, construction,
   analysis.py             |  structure, static figures
   visualize.py           /
+  report_figures.py         publication-styled figures for report/report.tex
   common.py              \
   degroot.py              |
   epidemic.py             |  Varun: dynamics, epidemic threshold,
@@ -78,6 +87,7 @@ src/
   build_dashboard.py     \  Arihant: builds the dashboard from data/
   dashboard_template/    /  its HTML/CSS/JS sources, inlined at build time
 figures/                 static PNG plots (dynamics_*.png are Varun's)
+  report/                vector PDF figures used by report/report.tex
 dashboard/               index.html, the interactive dashboard (self-contained)
 report/                  handoff docs + eventual report PDF
 ```

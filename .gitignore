@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+
+# latexmk build artifacts
+report/*.aux
+report/*.fdb_latexmk
+report/*.fls
+report/*.log
+report/*.out
